@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>台灣科技供應鏈韌性圖鑑｜論文背景知識庫</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230d1a26'/%3E%3Cpath d='M8 22V10h3v9h9v3z' fill='%23e6a23c'/%3E%3Ccircle cx='22' cy='10' r='2.6' fill='%235b9bd5'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+TC:wght@400;500;700;900&family=Noto+Serif+TC:wght@600;900&display=swap">
+<style>
+:root{
+  --bg:#0d1a26;            /* 深海軍藍黑 */
+  --bg-2:#122434;          /* 略淺一階 */
+  --bg-3:#182f42;          /* 卡片 */
+  --ink:#eaf2f8;           /* 主文字 */
+  --ink-dim:#9fb6c8;       /* 次要文字 */
+  --gold:#e6a23c;          /* 琥珀金 - 主強調 */
+  --gold-soft:#f0c26b;
+  --up:#5b9bd5;            /* 上游 - 鋼藍 */
+  --mid:#4fb286;           /* 中游 - 電路綠 */
+  --down:#e0704f;          /* 下游 - 熔銅橙 */
+  --ext:#7d93a8;           /* 外部節點 */
+  --line:rgba(230,242,248,.14);
+  --card:rgba(24,47,66,.72);
+  --radius:14px;
+  --font-sans:"Noto Sans TC",-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --font-serif:"Noto Serif TC",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-sans);
+  line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:
+    linear-gradient(rgba(230,242,248,.035) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(230,242,248,.035) 1px,transparent 1px);
+  background-size:44px 44px;
+}
+.wrap{position:relative;z-index:1;max-width:1200px;margin:0 auto;padding:0 22px;}
+
+/* ===== 頂部導航 ===== */
+.topbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(13,26,38,.9);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav{
+  max-width:1200px;margin:0 auto;padding:0 22px;
+  display:flex;align-items:center;gap:6px;height:60px;flex-wrap:wrap;
+}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto;font-weight:900;font-size:16px;letter-spacing:.5px;}
+.brand .chip{width:30px;height:30px;border-radius:7px;background:var(--bg-3);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none;}
+.brand .chip svg{width:18px;height:18px;fill:var(--gold);}
+.nav a{
+  color:var(--ink-dim);text-decoration:none;font-size:14px;padding:8px 13px;border-radius:8px;
+  transition:all .18s;cursor:pointer;white-space:nowrap;
+}
+.nav a:hover{color:var(--ink);background:var(--bg-3);}
+.nav a.active{color:var(--gold-soft);background:rgba(230,162,60,.12);}
+
+/* ===== 通用版面 ===== */
+.section{padding:64px 0 72px;}
+.sec-head{margin-bottom:34px;}
+.kicker{font-size:13px;letter-spacing:2.5px;color:var(--gold);margin-bottom:10px;font-weight:500;}
+.sec-title{font-family:var(--font-serif);font-size:30px;font-weight:900;line-height:1.3;}
+.sec-sub{color:var(--ink-dim);font-size:15px;margin-top:10px;max-width:780px;}
+.gold-line{width:56px;height:4px;background:var(--gold);border-radius:2px;margin-top:14px;}
+
+/* ===== Hero ===== */
+.hero{padding:96px 0 88px;position:relative;overflow:hidden;}
+.hero .glow{position:absolute;width:480px;height:480px;border-radius:50%;filter:blur(120px);opacity:.16;pointer-events:none;}
+.hero .glow.g1{background:var(--up);top:-140px;right:-80px;}
+.hero .glow.g2{background:var(--gold);bottom:-200px;left:-100px;}
+.hero .tag{display:inline-block;font-size:13px;color:var(--gold-soft);border:1px solid rgba(230,162,60,.4);padding:6px 14px;border-radius:30px;margin-bottom:22px;letter-spacing:1px;}
+.hero h1{font-family:var(--font-serif);font-size:44px;font-weight:900;line-height:1.25;max-width:860px;}
+.hero h1 .hl{color:var(--gold-soft);}
+.hero .sub{color:var(--ink-dim);font-size:17px;max-width:700px;margin-top:20px;}
+.hero .cta{margin-top:32px;display:flex;gap:14px;flex-wrap:wrap;}
+.btn{
+  display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  padding:13px 24px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;
+}
+.btn-primary{background:var(--gold);color:#1a1205;}
+.btn-primary:hover{background:var(--gold-soft);transform:translateY(-1px);}
+.btn-ghost{border:1px solid var(--line);color:var(--ink);background:var(--bg-3);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold-soft);}
+
+/* ===== 統計條 ===== */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:52px;}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 22px;}
+.stat .num{font-size:30px;font-weight:900;color:var(--gold-soft);font-variant-numeric:tabular-nums;}
+.stat .lbl{font-size:13px;color:var(--ink-dim);margin-top:4px;}
+
+/* ===== 關係圖 ===== */
+.chart-toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;align-items:center;}
+.chart-toolbar .grp-label{font-size:12.5px;color:var(--ink-dim);margin-right:4px;}
+.filter-btn{background:var(--bg-3);border:1px solid var(--line);color:var(--ink-dim);padding:7px 15px;border-radius:24px;font-size:13px;cursor:pointer;transition:all .18s;}
+.filter-btn:hover{color:var(--ink);}
+.filter-btn.active{background:var(--gold);border-color:var(--gold);color:#1a1205;font-weight:700;}
+.chart-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;position:relative;}
+#chainChart{width:100%;height:920px;}
+.chart-hint{color:var(--ink-dim);font-size:12.5px;margin-top:12px;line-height:1.8;}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin-top:14px;font-size:12.5px;color:var(--ink-dim);}
+.chart-legend .lg{display:inline-flex;align-items:center;gap:6px;}
+.chart-legend .dot{width:11px;height:11px;border-radius:3px;flex:none;}
+.chart-legend .dot.ext{border-radius:50%;border:2px solid var(--ext);background:transparent;}
+
+/* ===== 公司卡片 ===== */
+.comp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(262px,1fr));gap:18px;}
+.comp-card{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;
+}
+.comp-card:hover{transform:translateY(-3px);border-color:var(--gold);}
+.comp-card .tier-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:1px;padding:3px 9px;border-radius:20px;margin-bottom:10px;}
+.tier-up .tier-tag{background:rgba(91,155,213,.16);color:#9cc6ea;}
+.tier-mid .tier-tag{background:rgba(79,178,134,.16);color:#8fd4b2;}
+.tier-down .tier-tag{background:rgba(224,112,79,.16);color:#f0a088;}
+.comp-card h3{font-size:17px;font-weight:900;}
+.comp-card .code{color:var(--ink-dim);font-size:13px;}
+.comp-card .seg{color:var(--gold-soft);font-size:12.5px;margin-top:6px;}
+.comp-card .role{color:var(--ink-dim);font-size:13px;margin-top:8px;line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+
+/* ===== 公司詳情抽屜 ===== */
+.drawer-backdrop{position:fixed;inset:0;background:rgba(6,12,18,.6);z-index:40;opacity:0;visibility:hidden;transition:all .25s;backdrop-filter:blur(3px);}
+.drawer-backdrop.open{opacity:1;visibility:visible;}
+.drawer{
+  position:fixed;top:0;right:0;height:100%;width:min(620px,94vw);z-index:50;
+  background:var(--bg-2);border-left:1px solid var(--line);
+  transform:translateX(100%);transition:transform .3s cubic-bezier(.2,.8,.3,1);
+  overflow-y:auto;padding:40px 34px;
+}
+.drawer.open{transform:translateX(0);}
+.drawer .close{position:absolute;top:22px;right:24px;background:none;border:1px solid var(--line);color:var(--ink);width:44px;height:44px;border-radius:9px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.drawer .close:hover{border-color:var(--gold);color:var(--gold-soft);}
+.drawer h2{font-family:var(--font-serif);font-size:26px;font-weight:900;margin-top:14px;}
+.drawer .dcode{color:var(--gold);font-size:14px;margin-top:4px;}
+.drawer .drole{color:var(--ink-dim);font-size:14px;margin-top:12px;line-height:1.7;}
+.drawer h4{font-size:14px;letter-spacing:1px;color:var(--gold-soft);margin:26px 0 10px;border-bottom:1px solid var(--line);padding-bottom:8px;}
+.drawer ul{margin-left:18px;color:var(--ink-dim);font-size:14px;}
+.drawer ul li{margin-bottom:7px;}
+.drawer .fact{background:var(--bg-3);border-radius:10px;padding:14px 16px;font-size:14px;color:var(--ink);line-height:1.7;margin-top:6px;border-left:3px solid var(--gold);}
+.drawer .fact .src{display:block;font-size:11.5px;color:var(--ink-dim);margin-top:6px;word-break:break-all;}
+.drawer .fact .src a{color:var(--gold-soft);text-decoration:none;}
+.drawer .fact .v{font-size:11px;padding:1px 8px;border-radius:12px;margin-right:6px;}
+.drawer .fact .v.ok{background:rgba(79,178,134,.16);color:#8fd4b2;}
+.drawer .fact .v.warn{background:rgba(224,112,79,.16);color:#f0a088;}
+
+/* ===== 時間軸 ===== */
+.timeline{display:grid;grid-template-columns:110px 24px 1fr;gap:0 16px;max-width:900px;}
+.tl-item{display:contents;}
+.tl-time{font-weight:700;color:var(--gold-soft);font-size:14px;text-align:right;padding-top:2px;font-variant-numeric:tabular-nums;}
+.tl-axis{position:relative;display:flex;justify-content:center;}
+.tl-axis::before{content:"";position:absolute;top:2px;bottom:2px;width:2px;background:linear-gradient(var(--up),var(--gold),var(--down));}
+.tl-dot{width:14px;height:14px;border-radius:50%;background:var(--bg);border:3px solid var(--gold);position:relative;z-index:1;justify-self:center;align-self:flex-start;margin-top:2px;}
+.tl-body{padding-bottom:26px;}
+.tl-body .cat{display:inline-block;font-size:11px;color:var(--ink-dim);border:1px solid var(--line);padding:1px 9px;border-radius:14px;margin-bottom:6px;}
+.tl-body .e{font-weight:700;font-size:15px;}
+.tl-body .d{color:var(--ink-dim);font-size:13.5px;margin-top:4px;}
+.tl-body .lesson{margin-top:8px;font-size:12.5px;color:var(--gold-soft);background:rgba(230,162,60,.08);border-left:3px solid var(--gold);padding:8px 12px;border-radius:0 8px 8px 0;}
+.tl-body .lesson b{font-weight:700;}
+
+/* ===== 表格 ===== */
+.tbl-wrap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:auto;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:760px;}
+table caption{caption-side:top;text-align:left;padding:16px 20px;font-weight:700;font-size:15px;color:var(--gold-soft);}
+th,td{padding:13px 18px;text-align:left;font-size:13.5px;vertical-align:top;border-bottom:1px solid var(--line);}
+th{background:var(--bg-3);color:var(--ink-dim);font-size:12.5px;letter-spacing:.5px;font-weight:700;}
+tbody tr:hover{background:rgba(230,162,60,.05);}
+td .k{color:var(--gold-soft);font-weight:700;}
+
+/* ===== 韌性主題卡片 ===== */
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;}
+.theme-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;}
+.theme-card h3{font-size:17px;font-weight:900;color:var(--gold-soft);margin-bottom:10px;display:flex;gap:10px;align-items:flex-start;}
+.theme-card .n{font-family:var(--font-serif);font-size:13px;color:var(--ink-dim);flex:none;}
+.theme-card p{color:var(--ink-dim);font-size:14px;line-height:1.75;}
+.theme-card .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px;}
+.theme-card .co{font-size:11.5px;color:var(--ink);background:var(--bg-3);border:1px solid var(--line);padding:2px 10px;border-radius:16px;}
+
+/* ===== 來源與註腳 ===== */
+.src-note{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:24px;font-size:13.5px;color:var(--ink-dim);line-height:1.9;}
+.src-note b{color:var(--ink);}
+.verify-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+.vchip{font-size:12px;padding:4px 12px;border-radius:18px;}
+.vchip.ok{background:rgba(79,178,134,.14);color:#8fd4b2;border:1px solid rgba(79,178,134,.3);}
+.vchip.warn{background:rgba(224,112,79,.12);color:#f0a088;border:1px solid rgba(224,112,79,.28);}
+.vchip.neutral{background:rgba(159,182,200,.1);color:var(--ink-dim);border:1px solid var(--line);}
+
+/* ===== Footer ===== */
+footer{border-top:1px solid var(--line);padding:34px 0;color:var(--ink-dim);font-size:13px;}
+footer .row{display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;align-items:center;}
+footer .note{margin-top:10px;font-size:12px;opacity:.72;}
+
+/* ===== 視圖切換 ===== */
+.view{display:none;}
+.view.active{display:block;animation:fade .3s ease;}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+@media(max-width:860px){
+  .hero h1{font-size:30px;}
+  .stats{grid-template-columns:repeat(2,1fr);}
+  .nav{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch;gap:2px;}
+  .nav::-webkit-scrollbar{display:none;}
+  .nav .brand{flex:none;margin-right:14px;}
+  .nav a{flex:none;padding:8px 10px;font-size:13.5px;}
+  .section{padding:48px 0;}
+  .sec-title{font-size:25px;}
+  #chainChart{height:720px;}
+}
+@media(max-width:560px){
+  .hero h1{font-size:27px;}
+  .stat .lbl{font-size:13.5px;}
+  .hero .tag{font-size:12.5px;}
+  .chart-hint{font-size:12px;}
+  .stats{grid-template-columns:1fr 1fr;}
+  .hero{padding:64px 0;}
+  .comp-grid{grid-template-columns:1fr;}
+  .timeline{grid-template-columns:86px 20px 1fr;gap:0 10px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 頂部導航 ===== -->
+<header class="topbar">
+  <nav class="nav">
+    <div class="brand">
+      <span class="chip"><svg viewBox="0 0 24 24"><path d="M3 5h2V3h2v2h2v2H7v2H5V7H3zM13 5h8v2h-8zM3 13h2v2h2v2H5v2H3v-2H1v-2h2zM17 13h4v2h-4zM13 13h2v6h-2zM7 13h2v6H7zM11 9h2v2h-2z"/></svg></span>
+      台灣科技供應鏈韌性圖鑑
+    </div>
+    <a data-view="home" class="active">總覽</a>
+    <a data-view="chain">供應鏈關係圖</a>
+    <a data-view="companies">公司資料庫</a>
+    <a data-view="resilience">衝擊時間軸</a>
+    <a data-view="themes">韌性主題</a>
+    <a data-view="sources">資料與來源</a>
+  </nav>
+</header>
+
+<!-- ===== 首頁 ===== -->
+<main id="home" class="view active">
+  <div class="hero">
+    <div class="glow g1"></div><div class="glow g2"></div>
+    <div class="wrap">
+      <span class="tag">碩士論文背景知識庫 · 供應鏈韌性 × 台灣科技業</span>
+      <h1>台灣科技供應鏈韌性圖鑑<br><span class="hl">從晶圓到整機的關鍵公司與關係</span></h1>
+      <p class="sub">本研究《供應鏈韌性對台灣科技公司績效之影響（重大衝擊情境）》的背景知識補充：以產業環節為軸，收錄台灣主要科技公司、彼此供需關係、重大衝擊事件時間軸與韌性主題，供文獻探討與個案研究參考。</p>
+      <div class="cta">
+        <a class="btn btn-primary" data-goto="chain">探索供應鏈關係圖</a>
+        <a class="btn btn-ghost" data-goto="companies">瀏覽公司資料庫</a>
+      </div>
+      <div class="stats">
+        <div class="stat"><div class="num" id="stComp">27</div><div class="lbl">收錄台灣關鍵科技公司</div></div>
+        <div class="stat"><div class="num" id="stCat">8</div><div class="lbl">產業環節（IC設計→組裝）</div></div>
+        <div class="stat"><div class="num" id="stRel">81</div><div class="lbl">供需關係連結</div></div>
+        <div class="stat"><div class="num" id="stEvt">14</div><div class="lbl">重大衝擊事件（2016–2026）</div></div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===== 供應鏈關係圖視圖 ===== -->
+<section id="chain" class="view">
+  <div class="wrap">
+    <div class="section">
+      <div class="sec-head">
+        <div class="kicker">Supply Chain Map</div>
+        <div class="sec-title">台灣科技供應鏈關係圖</div>
+        <div class="sec-sub">互動式關係圖：拖曳節點可探索、點擊任一家公司可查看供應商／客戶與詳細資料。節點顏色代表產業環節，外框粗細代表供應鏈位置（上游／中游／下游）。</div>
+        <div class="gold-line"></div>
+      </div>
+      <div class="chart-toolbar" id="catFilter">
+        <span class="grp-label">產業環節：</span>
+        <button class="filter-btn active" data-cat="all">全部</button>
+      </div>
+      <div class="chart-box">
+        <div id="chainChart"></div>
+        <div class="chart-hint">操作提示：拖曳節點移動位置 · 滾輪縮放 · 點擊節點開啟公司詳情 · 點擊空白處取消選取。外部客戶／供應商節點（空心圓）預設隱藏，可由下方開關開啟。</div>
+        <div class="chart-toolbar" style="margin-top:14px;margin-bottom:0;">
+          <span class="grp-label">顯示：</span>
+          <button class="filter-btn" id="toggleExt">＋ 顯示外部客戶／供應商（32）</button>
+        </div>
+        <div class="chart-legend" id="chartLegend"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 公司資料庫視圖 ===== -->
+<section id="companies" class="view">
+  <div class="wrap">
+    <div class="section">
+      <div class="sec-head">
+        <div class="kicker">Company Database</div>
+        <div class="sec-title">台灣科技公司資料庫</div>
+        <div class="sec-sub">27 家公司依產業環節分類。點選卡片查看詳情：股票代碼、核心產品、關鍵客戶與供應商、供應鏈位置、韌性相關性，以及附來源的事實陳述。</div>
+        <div class="gold-line"></div>
+      </div>
+      <div class="chart-toolbar" id="compFilter">
+        <span class="grp-label">篩選：</span>
+        <button class="filter-btn active" data-tier="all">全部（27）</button>
+      </div>
+      <div class="comp-grid" id="compGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 衝擊時間軸視圖 ===== -->
+<section id="resilience" class="view">
+  <div class="wrap">
+    <div class="section">
+      <div class="sec-head">
+        <div class="kicker">Disruption Timeline</div>
+        <div class="sec-title">重大衝擊事件時間軸</div>
+        <div class="sec-sub">2016–2026 年間影響台灣科技供應鏈的關鍵衝擊事件，涵蓋地緣政治、疫情、自然災害與供給瓶頸。每則事件附影響說明與韌性啟示，呼應論文「重大衝擊情境」的選題。</div>
+        <div class="gold-line"></div>
+      </div>
+      <div class="timeline" id="timeline"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 韌性主題視圖 ===== -->
+<section id="themes" class="view">
+  <div class="wrap">
+    <div class="section">
+      <div class="sec-head">
+        <div class="kicker">Resilience Themes</div>
+        <div class="sec-title">供應鏈韌性主題註解</div>
+        <div class="sec-sub">跨公司的韌性觀察：單一客戶集中、地理集中、雙供應商策略、AI 瓶頸等，是論文分析架構的重要背景。</div>
+        <div class="gold-line"></div>
+      </div>
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 資料與來源視圖 ===== -->
+<section id="sources" class="view">
+  <div class="wrap">
+    <div class="section">
+      <div class="sec-head">
+        <div class="kicker">Sources & Method</div>
+        <div class="sec-title">資料來源與查證說明</div>
+        <div class="gold-line"></div>
+      </div>
+      <div class="src-note" id="srcNote"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 公司詳情抽屜 ===== -->
+<div class="drawer-backdrop" id="backdrop"></div>
+<aside class="drawer" id="drawer">
+  <button class="close" id="drawerClose" aria-label="關閉"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  <div id="drawerBody"></div>
+</aside>
+
+<!-- ===== Footer ===== -->
+<footer>
+  <div class="wrap">
+    <div class="row">
+      <span>台灣科技供應鏈韌性圖鑑 · 論文背景知識庫</span>
+      <span>供應鏈韌性 × 台灣科技公司（重大衝擊情境）</span>
+    </div>
+    <div class="note">本頁為論文背景知識彙整，非投資建議。公司資料依公開報導與年報整理，事實標示「已查證」／「一方稱」，若有出入以官方資訊為準。</div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+<script>
+(function(){
+"use strict";
+
+/* ===== 資料（由腳本注入）===== */
+var DATA = {"meta": {"title": "台灣科技供應鏈關係圖資料庫（論文知識補充）", "purpose": "陽明交大經管所碩士論文《供應鏈韌性對台灣科技公司績效之影響（重大衝擊情境）》之背景知識補充", "description": "涵蓋台灣科技業 8 大產業環節 27 家關鍵公司、供需關係、重大衝擊事件時間軸與供應鏈韌性註解；資料可直接轉為互動式供應鏈關係圖。", "generated": "2026-10-10", "verification_note": "「已查證」= 至少一個可信公開來源佐證；「一方稱」= 單一來源/公司自述/業界推斷，未獲獨立佐證；「無公開來源，待確認」= 業界常態但未找到直接來源。詳見各欄位 source。", "stats": {"companies": 27, "relations": 81, "external_nodes": 32, "events": 14, "company_facts": {"total": 126, "by_verified": {"一方稱": 36, "已查證": 90}}, "relations_by_verified": {"一方稱": 55, "已查證": 26}}}, "categories": ["晶圓代工", "記憶體", "IC設計", "封測", "EMS 電子代工", "品牌", "關鍵零組件", "面板"], "companies": [{"id": "vis", "name_zh": "世界先進積體電路", "name_en": "Vanguard International Semiconductor Corporation", "ticker": "5347", "category": "晶圓代工", "position": "中游", "layer": "上游", "segment": "8吋特色/功率代工", "core_products": ["8 吋/12 吋電源管理 IC（PMIC）代工", "驅動 IC（大尺寸/小尺寸）", "Discrete 離散元件", "GaN/SiC 功率元件", "eFlash MCU 特殊製程"], "key_customers": ["NXP（新加坡合資廠 VIS-NXP，NXP 認領 40% 產能）", "PMIC 與驅動 IC 設計廠（含國內外 IC Design House）", "車用/工業功率元件客戶"], "key_suppliers": ["台積電（大股東，技術移轉，2026/1 授權 GaN 技術）", "矽晶圓供應商", "成熟製程設備商"], "resilience_relevance": "世界先進為台積電持股的 8 吋特色製程代工廠，營收約 69% 來自電源管理 IC、28% 來自驅動 IC，產品組合高度集中於類比/功率元件，與先進邏輯製程高度差異化。為分散地緣風險，2026 年與 NXP 在新加坡合資約 67 億美元興建新廠（NXP 認領 40% 產能），並取得台積電 GaN 技術授權擴充功率半導體。其韌性意義在於：成熟類比製程不易被先進製程取代，但受 8 吋產能週期與車用/工業庫存調節影響大。", "facts": [{"fact": "1Q25 營收平台結構：Power Management 69%、Driver IC（Large）20%、Driver IC（Small）8%、Others 3%。", "verified": "已查證", "source": "https://www.vis.com.tw/assets/pdf/csr/Ch1-E.pdf"}, {"fact": "VIS 與 NXP 合資約 67 億美元新加坡晶圓廠 2026/9 開幕，NXP 取得 40% 產能，VIS 負責營運。", "verified": "已查證", "source": "https://apac.entrepreneur.com/business-news/vis-nxp-opens-6-7-bn-singapore-fab-as-physical-ai-broadens-chip-demand"}, {"fact": "2026/1/28 VIS 宣布由大股東台積電取得 GaN 技術授權。", "verified": "已查證", "source": "https://www.emsodm.com/html/2026/01/29/1769654535406.html"}]}, {"id": "psmc", "name_zh": "力積電", "name_en": "Powerchip Semiconductor Manufacturing Corporation", "ticker": "6770", "category": "晶圓代工", "position": "中游", "layer": "上游", "segment": "利基成熟代工(含記憶體/Logic-DRAM)", "core_products": ["分離式元件（Discrete）", "高壓邏輯驅動 IC（HV Driver）", "CIS 影像感測", "PMIC 電源管理 IC", "嵌入式邏輯、利基型 Flash/DRAM", "GaN on Si（與 Navitas 合作 200mm）"], "key_customers": ["Navitas Semiconductor（GaN）", "AMD（Logic-DRAM/2.5D 中介層技術合作）", "Novatek 等顯示驅動 IC 設計公司", "國內外電源管理 IC 與離散元件設計廠"], "key_suppliers": ["矽晶圓供應商（含環球晶等）", "泛用設備商（成熟製程設備）", "SBI Holdings（日本宮城合資夥伴）"], "resilience_relevance": "力積電為利基/記憶體背景之成熟製程代工廠，產品組合分散於離散元件、高壓驅動、CIS、PMIC 與利基記憶體，與台積電先進製程明顯差異化。2024 年發表 Logic-DRAM 多層堆疊與 2.5D 中介層技術，與 AMD 等合作切入 AI 相關供應鏈；2025 年與 Navitas 合作 200mm GaN 量產。為分散台灣集中風險，與 SBI Holdings 合作在日本宮城興建晶圓廠。受成熟製程景氣循環與中國對手擴產影響大。", "facts": [{"fact": "力積電產品組合涵蓋 Discrete、HV 高壓驅動、CIS、PMIC、嵌入式邏輯、Flash、DRAM 等利基項目。", "verified": "已查證", "source": "https://blog.knak.jp/2023/07/sbipsmc.html"}, {"fact": "2024/8/4 力積電發表 Logic-DRAM 多層晶圓堆疊與 2.5D 中介層技術，AMD 等大廠將採用與先進邏輯製程整合。", "verified": "已查證", "source": "https://www.digitimes.com/news/a20240905PD203/3d-ai-chips-powerchip-psmc-semicon-taiwan-2024-technology.html?mod=0"}, {"fact": "Navitas 與力積電策略合作，在後者竹科 Fab 8B（200mm）量產 GaN on Si 元件。", "verified": "已查證", "source": "https://businessupturn.com/brand-post/navitas-announces-plans-for-200mm-gan-production-with-psmc/"}, {"fact": "力積電 2026Q2 以 4.32 億美元營收排名全球晶圓代工第 10。", "verified": "已查證", "source": "https://www.communicationstoday.co.in/ai-boom-pushes-top-10-foundries-to-record-53-5b-revenue-in-q2/"}]}, {"id": "nanya", "name_zh": "南亞科技", "name_en": "Nanya Technology Corporation", "ticker": "2408", "category": "記憶體", "position": "中游", "layer": "上游", "segment": "DRAM", "core_products": ["Standard DRAM（DDR4/DDR5/LPDDR）", "伺服器用 RDIMM/企業級 DRAM", "利基型 DRAM（消費/車用/工業）", "企業級 SSD、NIC、BMC（集團產品組合）"], "key_customers": ["NVIDIA", "Google", "Microsoft", "Intel", "AMD", "Qualcomm", "伺服器 CSP 與企業級 OEM"], "key_suppliers": ["矽晶圓供應商", "EUV/微影設備商（Fab 5A 計畫導入 EUV）", "南亞塑膠集團（母公司）"], "resilience_relevance": "南亞科是台灣唯一專營 Standard DRAM 的公司，與三星、SK 海力士、美光同屬 DRAM 寡頭但規模小一階。過去利基定位使其標準品敞口低、波動較小；2025-2026 年受 AI 伺服器需求推動，積極切入伺服器 DRAM，並公布 Fab 5A 最高 107 億美元投資計畫，目標 10nm 級 DRAM 導入 EUV。為降低記憶體景氣循環風險，公司與客戶簽訂長期協議（LTA）覆蓋約 50% 產能，部分短約轉長約。地緣上 DRAM 設備同樣受美日荷出口管制影響。", "facts": [{"fact": "南亞科公布 Fab 5A 最高 107 億美元投資計畫（至 2029），目標 10nm 級 DRAM 並導入 EUV；客戶涵蓋 NVIDIA、Google、Microsoft、Qualcomm、Intel、AMD。", "verified": "已查證", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"fact": "南亞科長期協議（LTA）已覆蓋約 50% 產能，短期合約逐步轉長約。", "verified": "一方稱", "source": "https://aikraft.ru/news/nanya-announces-10-7b-investment-in-fab5a-aims-for-10-nm-class-euv-dra"}, {"fact": "南亞科總經理李培瑛表示記憶體供需不平衡恐要到 2028 下半年才會改善。", "verified": "已查證", "source": "https://wdatahk.aastocks.com/en/stocks/analysis/stock-aafn-con/07709/AAFN/NOW.1507244/hk-stock-news"}]}, {"id": "tsmc", "name_zh": "台灣積體電路（台積電）", "name_en": "Taiwan Semiconductor Manufacturing Company Limited", "ticker": "2330", "category": "晶圓代工", "position": "中游", "layer": "上游", "segment": "先進製程邏輯代工", "core_products": ["先進製程邏輯晶圓代工（N3/N5/N7/N2）", "特殊製程（RF、BCD、CIS、eMRAM）", "先進封裝 CoWoS/InFO", "光罩製作", "3DFabric 矽堆疊"], "key_customers": ["Apple（2025 年約 17% 營收）", "NVIDIA（2025 年約 19% 營收，最大客戶）", "AMD", "Qualcomm", "MediaTek", "Broadcom", "Intel", "Sony（影像感測代工）"], "key_suppliers": ["ASML（EUV 曝光設備獨家供應商）", "Applied Materials（應用材料）", "Tokyo Electron（東京威力科創）", "Shin-Etsu Chemical（信越化學，矽晶圓）", "SUMCO（矽晶圓）", "GlobalWafers（環球晶，矽晶圓）", "JSR/TOK/Sumitomo（光阻等微影材料）"], "resilience_relevance": "台積電是全球最先進製程（7nm 以下）約 90% 產能的集中地，本身即是台海地緣風險的最大節點。客戶高度集中：2025 年 NVIDIA 與 Apple 兩家合計貢獻約 36% 營收，且 AI 需求暴衝使 CoWoS 先進封裝成為新瓶頸。供應端對 ASML EUV 設備與信越/SUMCO 矽晶圓雙寡頭高度依賴。為分散地緣風險，台積電採「先進製程留台灣、成熟製程海外複製」策略，在美國亞利桑那（投資增至約 1650 億美元）、日本熊本（JASM，與 Sony/Denso 合資）、德國德勒斯登（ESMC，與 Bosch/Infineon/NXP 合資）建立海外產能；同時受美國對華出口管制直接影響，需為中國客戶申請輸出許可。", "facts": [{"fact": "2025 年 NVIDIA 超越 Apple 成為台積電最大客戶，占營收約 19%，Apple 約 17%（2024 年 Apple 約 22-25%）。", "verified": "一方稱", "source": "https://www.theteardown.co/tsmc"}, {"fact": "2Q25 營收結構：HPC 60%、Smartphone 27%、IoT 5%、Automotive 5%、DCE 1%、Others 2%。", "verified": "已查證", "source": "https://investor.tsmc.com/english/encrypt/files/encrypt_file/reports/2025-07/1fec9df3de99e6e9f190e1eda7179449381ce6d8/2Q25ManagementReport.pdf"}, {"fact": "台積電亞利桑那廠投資規模已擴增至約 1650 億美元，規劃最多 12 座廠與 4 座先進封裝廠，為美國史上最大外人直接投資。", "verified": "一方稱", "source": "https://informedclearly.com/en/trade-war/58051/silicon-realignment-chip-export-controls-2026"}, {"fact": "SUMCO 連續 12 年獲台積電供應鏈獎，為其主要矽晶圓供應商之一；信越與 SUMCO 合計控制全球約 55% 矽晶圓供給。", "verified": "已查證", "source": "https://www.sumcosi.com/english/corporate/evaluation.html"}, {"fact": "ASML 為 EUV 曝光設備唯一商業供應商，市占逾 90%，台積電對其設備交付時程高度依賴。", "verified": "已查證", "source": "https://portersfiveforce.com/products/tsmc-five-forces-analysis"}, {"fact": "德國德勒斯登 ESMC 廠由台積電與 Bosch、Infineon、NXP 合資，2024/8/20 奠基，規劃 28/22nm 與 16/12nm FinFET，月產 4 萬片。", "verified": "已查證", "source": "https://m.36kr.com/p/3705138210664577"}]}, {"id": "macronix", "name_zh": "旺宏電子", "name_en": "Macronix International Co., Ltd.", "ticker": "2337", "category": "記憶體", "position": "中游", "layer": "上游", "segment": "NOR Flash/ROM", "core_products": ["NOR Flash（Serial/Parallel/車規）", "ROM 唯讀記憶體（XtraROM）", "SLC NAND Flash", "車用/工業/通訊儲存解決方案"], "key_customers": ["Nintendo（Switch 遊戲卡匣 ROM 主要供應商）", "車用 Tier-1（ADAS、智慧駕駛）", "通訊/伺服器設備客戶", "PC/消費電子客戶"], "key_suppliers": ["矽晶圓供應商", "記憶體設備商", "自有晶圓廠（竹科）為主"], "resilience_relevance": "旺宏為全球 NOR Flash 與 ROM 利基領導廠，2025 年 NOR Flash 占總營收 61%、ROM 占 16%，其中車用/工業/醫療/航太等高質應用占 NOR 的 38%。歷史上長期壟斷任天堂 Switch 遊戲卡匣 ROM 供應，使 ROM 業務與遊戲主機景氣高度綁定；2025 年起 Switch 2 改用 3D NAND，旺宏需自製 MLC NAND 並外採 3D NAND 因應，是供應鏈策略調整的代表性案例。NOR 產品受高容量 AI 邊緣裝置與車用驅動，2026 年供不應求。", "facts": [{"fact": "2025 年 NOR Flash 占旺宏總營收 61%、ROM 占 16%；NOR 中車用/工業/醫療/航太高質應用占 38%。", "verified": "已查證", "source": "https://www.macronix.com/en-us/about/investor-relations/Documents/annualreport_2025_en.pdf"}, {"fact": "旺宏 ROM 主要用於任天堂 Switch 實體遊戲卡匣；Switch 2 將改採 3D NAND，旺宏將自製 MLC NAND 並外購 3D NAND 因應。", "verified": "已查證", "source": "https://finance.sina.com.cn/tech/digi/2025-08-05/doc-infiwxmc1159192.shtml"}, {"fact": "旺宏為任天堂 Switch 遊戲卡匣主要 ROM 製造商，合作關係可追溯至 GameCube/Wii 世代。", "verified": "已查證", "source": "https://automaton-media.com/en/column/masahiro-shindo-the-secret-hero-who-propped-up-nintendos-console-development-from-the-nes-through-to-the-nintendo-switch/"}, {"fact": "2025Q4 NOR 營收應用別：電腦 37%、通訊 21%、車用 19%、工業 17%、消費 6%。", "verified": "已查證", "source": "https://www.macronix.com/Lists/QuarterlyResults/Attachments/645/2025q4%20webcast_ppt_ch.pdf"}]}, {"id": "umc", "name_zh": "聯華電子（聯電）", "name_en": "United Microelectronics Corporation", "ticker": "2303", "category": "晶圓代工", "position": "中游", "layer": "上游", "segment": "成熟/特殊製程代工", "core_products": ["28/22nm 邏輯與特殊製程代工", "14/12nm FinFET（與 Intel 合作開發 12FFC）", "混合訊號/RF/BCD/eFlash 特殊製程", "顯示驅動 IC、網通 IC、車用 IC 代工"], "key_customers": ["Texas Instruments", "MediaTek", "Intel（12FFC 合作）", "Broadcom", "Qualcomm", "Novatek（聯詠）", "Realtek（瑞昱）", "Infineon"], "key_suppliers": ["ASML（DUV/EUV 曝光設備）", "Applied Materials", "Tokyo Electron", "Shin-Etsu/SUMCO/GlobalWafers（矽晶圓）", "日商/美商光阻與特化材料商"], "resilience_relevance": "聯電 2018 年宣布停止 7nm 以下先進製程開發，轉型成熟/特殊製程代工，避開了與台積電在先進製程的直接競爭，但也使產品組合集中於 22/28nm（2025Q4 占晶圓收入 36%）。客戶涵蓋 TI、MediaTek、Broadcom、Qualcomm、Novatek、Realtek 等，分散度高於台積電。全球 12 座廠分布於台灣、中國、日本、新加坡，並與 Intel 在美國合作開發 12FFC 以強化北美供應鏈韌性。成熟製程受中國內產能擴張與價格競爭影響較大，是其韌性主要壓力來源。", "facts": [{"fact": "2025 全年 22nm 營收年增 93%，Q4 2025 創新高；22/28nm 占 4Q25 晶圓收入 36%。", "verified": "已查證", "source": "https://www.sec.gov/Archives/edgar/data/1033767/000095017025006966/umc-ex99.htm"}, {"fact": "聯電客戶組合包含 Texas Instruments、MediaTek、Intel、Broadcom、Novatek、Realtek，應用於通訊、顯示、記憶體、車用。", "verified": "已查證", "source": "https://www.morningstar.com/stocks/xnys/umc/quote?category=earnings&date=2026-04-22"}, {"fact": "聯電與 Intel 在美國合作開發 12nm FinFET 平台（12FFC），目標 2026 年完成驗證、2027 年量產，以強化北美供應鏈韌性。", "verified": "已查證", "source": "https://valuechain.wiki/umc?lang=en"}, {"fact": "聯電全球營運 12 座晶圓廠，分布於台灣、中國大陸、日本、新加坡，約 19,000 名員工。", "verified": "已查證", "source": "https://www.morningstar.com/stocks/xnys/umc/quote?category=earnings&date=2026-04-22"}]}, {"id": "winbond", "name_zh": "華邦電子", "name_en": "Winbond Electronics Corporation", "ticker": "2344", "category": "記憶體", "position": "中游", "layer": "上游", "segment": "利基型DRAM+NOR/SLC NAND", "core_products": ["利基型 DRAM（Specialty DRAM）", "SPI NOR Flash（QSPI/Octal/1.2V Low-power）", "SLC NAND Flash", "儲存記憶體（MCP、Secure Flash）", "邏輯代工（老廠產能）"], "key_customers": ["車用 Tier-1（ADAS、DMS、智慧座艙）", "工業/通訊設備客戶", "消費電子與物聯網裝置", "PC/周邊與通訊電子客戶"], "key_suppliers": ["矽晶圓供應商", "記憶體設備商", "竹科/中科自有廠房為主"], "resilience_relevance": "華邦定位為利基型記憶體供應商，產品組合與南亞科（Standard DRAM）、旺宏（NOR/ROM）互補：同時經營利基型 DRAM 與 NOR/SLC NAND。2025Q3 應用別比重為消費 30%、車用與工業 28%、通訊 22%、電腦 20%；2025 年車用+工業佔 27%、年增 29%，積極切入車規與 Edge AI。與 Standard DRAM 大廠相比，利基產品客製化高、價格波動較小，但仍受記憶體景氣循環與中國廠商競爭影響。", "facts": [{"fact": "2025Q3 記憶體營收應用別：消費 30%、車用及工業 28%、通訊 22%、電腦 20%；Flash 線占營收 35%。", "verified": "已查證", "source": "https://www.winbond.com/hq/about-winbond/news-and-events/news/news00567.html?__locale=en"}, {"fact": "2024 年 SPI NOR Flash 市場規模約 27.26 億美元、SLC NAND 約 12.02 億美元，華邦為主要供應商之一。", "verified": "已查證", "source": "https://www.winbond.com/export/sites/winbond/about-winbond/investor/investor-conference/material/1Q25-investor-conference_EN_Final.pdf"}, {"fact": "2025 年華邦車用與工業電子營收占比達 27%，年增 29%，受車用智慧化驅動。", "verified": "已查證", "source": "https://www.eet-china.com/news/202603202265.html"}]}, {"id": "kyec", "name_zh": "京元電子", "name_en": "King Yuan Electronics Co., Ltd. (KYEC)", "ticker": "2449", "category": "封測", "position": "中游偏後段（IC測試專業OSAT）", "layer": "中游", "segment": "專業半導體測試", "core_products": ["晶圓測試（wafer sort / CP probing）", "成品IC測試（final test）", "AI晶片測試（GPU、ASIC、CPU、網通晶片）", "測試衍芯、封裝後段支援"], "key_customers": ["NVIDIA輝達", "Apple蘋果", "MediaTek聯發科", "AMD（含Xilinx）", "全球前50大半導體公司中48%為其客戶"], "key_suppliers": ["測試設備商（如愛德萬Advantest、泰瑞達Teradyne）", "晶圓代工/封裝廠提供待測晶圓與封裝體", "載板/材料周邊供應商"], "resilience_relevance": "京元電子為全球最大的純測試（pure-play）半導體測試公司，測試營收排名全球第二，是台灣後段測試的關鍵韌性節點。其產能集中於台灣（苗栗/竹南），地緣政治風險集中；客戶高度橫跨全球一線IC廠（NVIDIA、蘋果、聯發科、AMD等），全球前50大半導體公司中48%使用其測試服務，客戶分散度高。AI需求爆發使高端晶片測試（GPU/ASIC/CPU）成為成長主力，公司積極擴充高階測試產能；2021年曾爆發疫情廠區群聚而暫停生產，是台灣半導體供應鏈「單一節點中斷」衝擊韌性的代表性歷史事件。", "facts": [{"fact": "京元電子官網自稱為全球測試營收第二、全球最大的純測試半導體公司，專攻AI晶片（GPU、ASIC、CPU、網通晶片）高階測試。", "verified": "已查證", "source": "https://www.kyec.com.tw/en/About/company-profile"}, {"fact": "京元電子投資人簡報揭露全球前50大半導體公司中48%使用京元測試服務（Gartner 2026），客戶標記包含NVIDIA、Apple、MediaTek、AMD。", "verified": "已查證", "source": "https://www.kyec.com.tw/Upfiles/EDUp/files/%E6%8A%95%E8%B3%87%E4%BA%BA%E9%97%9C%E4%BF%82/%E6%AF%8F%E5%AD%A3%E7%87%9F%E9%81%8B%E5%A0%B1%E5%91%8A/KYEC(2449)_1Q26%20Investor%20update_English.pdf"}, {"fact": "京元2Q26投資人簡報列出2025年全球半導體廠排名中Apple第9（營收約22,503）、MediaTek第10（約18,437），二者皆標記為京元客戶。", "verified": "已查證", "source": "https://www.kyec.com.tw/Upfiles/EDUp/files/%E6%8A%95%E8%B3%87%E4%BA%BA%E9%97%9C%E4%BF%82/%E6%AF%8F%E5%AD%A3%E7%87%9F%E9%81%8B%E5%A0%B1%E5%91%8A/KYEC(2449)_2Q26%20Investor%20update_English.pdf"}, {"fact": "2024年全球前50大半導體公司中，排除中國及記憶體公司後，有63%為京元電子客戶。", "verified": "一方稱", "source": "https://www.kyec.com.tw/Upfiles/EDUp/files/%E6%8A%95%E8%B3%87%E4%BA%BA%E9%97%9C%E4%BF%82/%E6%AF%8F%E5%AD%A3%E7%87%9F%E9%81%8B%E5%A0%B1%E5%91%8A/KYEC(2449)_1Q26%20Investor%20update_Chinese.pdf"}]}, {"id": "liteon", "name_zh": "光寶科技", "name_en": "LITEON Technology", "ticker": "2301", "category": "關鍵零組件", "position": "中游（電源/光電零組件供應商）", "layer": "中游", "segment": "電源/光電", "core_products": ["交換式電源供應器（ATX、CRPS 伺服器電源）", "USB-PD 電源轉接器、LED 驅動器", "光電半導體（LED、紅外線、UV、感測器）", "AI 伺服器液冷系統與 800VDC 機櫃電源", "車用電子與光電"], "key_customers": ["Apple（電源轉接器/供應器）", "NVIDIA（GB200/MGX 平台電源系統）", "廣達旗下雲達 QCT（800VDC 液冷電源機櫃）", "伺服器/PC ODM 與品牌"], "key_suppliers": ["功率半導體與被動元件供應鏈", "散熱/液冷零組件"], "resilience_relevance": "光寶自 1985 年生產交換式電源，為全球前三大 OEM 電源供應商之一，並擁有全球領先的光電半導體事業。其韌性關鍵在於：(1) 2024 年起為 NVIDIA GB200 NVL72 設計並在台灣製造高效電源系統，符合 MGX/ORV3，受 AI 伺服器電源需求爆發帶動；(2) 與廣達雲達聯手展出 800VDC 液冷電源機櫃、支援 Vera Rubin NVL72，深度綁定伺服器 ODM 客戶；(3) 客戶結構橫跨 Apple、NVIDIA、伺服器廠，分散單一客戶風險但仍受消費電子與 AI 資本支出雙循環影響；(4) 全球廠分布台灣、中國（天津、常州、東莞）等地，具地緣調度壓力。", "facts": [{"fact": "光寶自 1985 年生產交換式電源，為全球前三大 OEM 交換式電源供應商之一。", "verified": "已查證", "source": "https://power.liteon.com/"}, {"fact": "光寶於 COMPUTEX 2024 首次展出為 NVIDIA GB200 NVL72 設計製造的高效電源系統，符合 MGX 與 ORV3 規範。", "verified": "已查證", "source": "https://www.liteon-cips.com/products/liteon-liquid-cooling-system/"}, {"fact": "光寶與廣達旗下雲達 QCT 聯合展出 800VDC 液冷電源機櫃及支援 NVIDIA Vera Rubin NVL72 的高階電源方案。", "verified": "已查證", "source": "https://www.knews.com.tw/search/%E9%9B%B2%E9%81%94"}, {"fact": "光寶光電事業部（OPS）為全球領先的光電半導體供應商，產品橫跨 LED、雷射、紅外線、UV 與感測。", "verified": "已查證", "source": "https://optoelectronics.liteon.com/zh-cn/Home/index/"}, {"fact": "光寶提供 ATX、CRPS、USB-PD 轉接器、LED 驅動器、PoE 注入器等電源模組。", "verified": "已查證", "source": "https://power.liteon.com/"}]}, {"id": "auo", "name_zh": "友達光電", "name_en": "AUO Corporation", "ticker": "2409", "category": "面板", "position": "中游（面板製造／顯示器供應商）", "layer": "中游", "segment": "面板", "core_products": ["筆記型電腦面板（LTPS）", "桌面顯示器面板", "電視面板", "車用顯示 HMI（智慧座艙）", "Micro LED／Mini LED 背光", "工業/醫療面板"], "key_customers": ["筆電品牌：華碩、宏碁、Dell、HP、Lenovo", "電視品牌", "Apple（Mac 筆電面板，據報主供）", "車用一級/Tier-1"], "key_suppliers": ["玻璃基板（Corning 等）", "偏光板、驅動 IC（聯詠等）、LED 晶粒"], "resilience_relevance": "友達為全球大尺寸 LCD 前五大廠（2025H1 看出貨面積約 8.5%），是面板景氣循環的典型代表。其韌性關鍵在於：(1) 面板產業強烈 Boom-Bust 循環，受電視/筆電終端需求與中國京東方、TCL 華星擴產競爭主導；(2) 積極轉型車用顯示、工業、Micro LED 以降低對消費面板循環的暴露；(3) 生產高度集中台灣（台中/苗栗），台海地緣風險下的單一區域集中風險；(4) 客戶橫跨華碩、宏碁、Dell、HP、Apple 等品牌，面板作為筆電/電視關鍵零組件直接受品牌拉貨與關稅影響；(5) 驅動 IC 依賴聯詠等台灣 IC 設計廠，供應鏈在地化程度高。", "facts": [{"fact": "2025 年 1-6 月全球大尺寸 LCD 市占（看出貨面積）：京東方 28.9%、TCL華星 24.6%、惠科 11.8%、群創 9.5%、友達 8.5%。", "verified": "已查證", "source": "https://pdf.dfcfw.com/pdf/H3_AP202508191730254504_1.pdf?1755592898000.pdf"}, {"fact": "友達為筆記型電腦面板領先供應商之一，提供從一般到高階 LTPS 面板。", "verified": "已查證", "source": "https://www.auo.com/en-global/products/index/Display_Panel_Products/Notebook"}, {"fact": "友達 2024 年 6 月合併營收約新台幣 252 億元，大尺寸面板出貨面積約 205 萬平方公尺。", "verified": "已查證", "source": "https://www.auo.com/en-global/New_Archive/detail/news_MonthlySales_20240709"}, {"fact": "據產業報告，友達主供 Apple Mac 用筆電面板（群創側重遊戲用 Fast-IPS）。", "verified": "一方稱", "source": "https://www.docin.com/touch_new/preview_new.do?id=4963663726"}, {"fact": "友達 2024 SID 獲『最佳 Micro LED 技術應用』與『最佳車用顯示』大獎，積極布局車用與 Micro LED。", "verified": "已查證", "source": "https://auo.com/zh-TW/News_Archive/detail/news_awards_20240517"}]}, {"id": "delta", "name_zh": "台達電子", "name_en": "Delta Electronics, Inc.", "ticker": "2308", "category": "關鍵零組件", "position": "中游（關鍵零組件／電源與熱管理供應商）", "layer": "中游", "segment": "電源/散熱/車電", "core_products": ["交換式電源供應器（伺服器/資料中心 power shelf，ORV3 33kW/66kW）", "散熱與熱管理（風扇、液冷）", "電動車電力電子（OBC 車載充電器、DC/DC、充電樁）", "通訊電源、UPS", "被動元件", "太陽能逆變器"], "key_customers": ["Apple（電源/充電元件）", "Tesla（電力元件）", "NVIDIA（MGX/Blackwell 平台機櫃電源與散熱）", "伺服器 ODM：鴻海 Foxconn、廣達 Quanta、緯創 Wistron", "電信與資料中心營運商"], "key_suppliers": ["Texas Instruments（EV 車載充電長期合作）", "功率半導體被動元件供應鏈（中國/台灣/東南亞）"], "resilience_relevance": "台達是全球交換式電源、DC 無刷風扇與通訊電源的市占龍頭，是 AI 資料中心機櫃電源與散熱的核心供應商。其韌性關鍵在於：(1) 全球多國分散製造（台、中、泰、印、墨、巴、斯洛伐克約48廠），CEO 公開表示因應 EV 與伺服器需求『到處擴廠』，反映中美關稅與地緣風險下的產能重新布局；(2) 對 Apple、Tesla、NVIDIA 等頂級客戶的深度绑定，既是需求穩定來源也是客戶集中度風險；(3) 2024-2026 AI 資料中心電源需求爆發使其成為『AI 基礎設施骨幹』，但也使其景氣高度依賴 AI 資本支出循環。", "facts": [{"fact": "台達為全球交換式電源供應器、DC 無刷風扇、通訊電源系統的市占第一供應商（World's No.1）。", "verified": "已查證", "source": "https://www.deltapowersolutions.com/media/download/Brochure_InfraSuite-Data-Center-Solutions_en-global-non-na.pdf"}, {"fact": "Reuters 報導台達是 Apple 與 Tesla 的電力元件供應商，並因應 EV 與伺服器榮景『到處擴廠』。", "verified": "已查證", "source": "https://au.investing.com/news/stock-market-news/taiwans-delta-electronics-expanding-everywhere-on-ev-server-boom-2562050"}, {"fact": "台達為 NVIDIA MGX 平台客製化電源與散熱方案，ORV3 1RU 33kW power shelf 效率達 97.5%，對應 NVIDIA Blackwell 平台。", "verified": "已查證", "source": "https://www.delta-americas.com/en-us/news/delta-unveils-a-total-cutting-edge-power-and-cooling-solution-tailored-for-the-nvidia-mgx-platform-at-ocp-global-summit-2024"}, {"fact": "台達全球約 48 座製造廠分布於台灣、中國、泰國、印度、墨西哥、巴西、斯洛伐克等地。", "verified": "已查證", "source": "https://filecenter.deltaww.com/Products/download/07/0701/Catalogue/Brochure_UPS_en-EMEA-SEA_EECCAI-03.5-JY.pdf"}, {"fact": "Texas Instruments 與台達於 2024 年宣布長期合作開發下一代 EV 車載充電與電源方案（平鎮聯合創新實驗室）。", "verified": "已查證", "source": "https://texasinsturments.mediaroom.com/2024-06-21-Texas-Instruments-and-Delta-Electronics-announce-collaboration-to-advance-electric-vehicle-onboard-charging"}, {"fact": "2025 年合併營收約新台幣 5,549 億元（年增 32%），2026 年初市值突破 1,000 億美元，受 AI 電源需求驅動。", "verified": "已查證", "source": "https://t.media/3178727"}]}, {"id": "yageo", "name_zh": "國巨", "name_en": "YAGEO Corporation", "ticker": "2327", "category": "關鍵零組件", "position": "上游（被動元件供應商）", "layer": "中游", "segment": "被動元件(MLCC/電阻)", "core_products": ["積層陶瓷電容 MLCC", "晶片電阻（晶片式電阻）", "鉭質電容", "電感（併購奇力新）", "EMI 雜訊抑制元件（磁珠、磁芯）", "釺性/薄膜電阻"], "key_customers": ["EMS 大廠（鴻海、廣達等 ODM/EMS）", "消費電子/車用/工業品牌", "分銷商：Rutronik、Mouser 等"], "key_suppliers": ["陶瓷粉體/介電材料供應商（日韓為主，如村田系材料體系）", "設備廠"], "resilience_relevance": "國巨是全球晶片電阻市占第一（約34%）、MLCC 約全球第5（2025 約5.4%）的被動元件龍頭，是被動元件景氣循環的典型代表。其韌性關鍵在於：(1) 2017-2018 年因村田減產、訂單轉台廠而出現 MLCC 缺貨、報價大漲 40-50% 的超級循環，客戶為搶貨簽長約；(2) 2023 年歷經長達一季的庫存修正循環，反映被動元件高周期性；(3) 2026 年 AI 伺服器需求使高端 MLCC 客戶提前鎖定半年至數年產能，訂單能見度拉長；(4) 客戶結構以 EMS/消費電子為主，受終端品牌拉貨節奏與關稅影響大；(5) 產能分布台灣、中國與東南亞，具地緣調度彈性。", "facts": [{"fact": "國巨晶片電阻市占率約 34%，穩居全球第一；MLCC 按出貨量排名全球第三（台灣最大）。", "verified": "一方稱", "source": "https://www.iesdouyin.com/share/video/7674944596991823154"}, {"fact": "依摩根士丹利統計，2025 年全球 MLCC 市占：村田 40.8%、三星電機 22.5%、太陽誘電 11.3%、TDK 6.9%、國巨 5.4%。", "verified": "已查證", "source": "https://wap.stockstar.com/detail/IG2026091600037562"}, {"fact": "2018 年因村田減產、訂單轉向台廠，國巨 MLCC 報價一度傳出調漲 40-50%，0402 105 規格特別吃緊。", "verified": "已查證", "source": "https://www.semimedia.cc/yageo-may-increase-the-mlcc-price-by-40-50/"}, {"fact": "2018 年被動元件缺貨期間，國巨與分銷商 Rutronik 簽訂陶瓷電容與電阻長期供貨約，保供至 2020 年中。", "verified": "已查證", "source": "https://www.powersystemsdesign.com/articles/rutronik-and-yageo-announce-long-term-agreement/8/13593"}, {"fact": "2026 年國巨表示 AI 相關客戶為避險提前鎖定未來半年至數年產能，MLCC 在手訂單環增 49.4%。", "verified": "已查證", "source": "https://www.stcn.com/article/detail/4070633.html"}, {"fact": "2023 年因庫存修正，分析師下調國巨營收預期，反映被動元件高景氣循環特性。", "verified": "已查證", "source": "https://kessler-prod.reta52d8.eas.morningstar.com/stocks/semco-yageo-should-see-mlcc-utilization-improve-h2"}]}, {"id": "largan", "name_zh": "大立光電", "name_en": "Largan Precision Co., Ltd.", "ticker": "3008", "category": "關鍵零組件", "position": "中游（光學零組件供應商）", "layer": "中游", "segment": "光學鏡頭", "core_products": ["智慧型手機相機塑膠鏡頭（4P-7P 多片式）", "潛望式望遠鏡頭", "可變光圈鏡頭", "車用/光學/CPO 相關光學元件"], "key_customers": ["Apple（最大客戶，iPhone 高階鏡頭主力供應）", "Samsung 與一線 Android 旗艦品牌"], "key_suppliers": ["光學級塑膠原料（COC/COP）", "精密模具與設備"], "resilience_relevance": "大立光是全球最大的智慧型手機相機鏡頭供應商（全球市占 30%+），是供應鏈韌性討論中『單一客戶集中風險』的典型案例。其韌性關鍵在於：(1) 約 80% 營收來自 Apple（2026 年外資分析），iPhone 拉貨節奏直接決定其營收動能，單一客戶依賴度極高；(2) 在高階潛望式鏡頭仍占 Apple 約 80% 份額，但舜宇光學（Sunny）與玉晶光（GSEO）已陸續進入 Apple 6P/7P 鏡頭供應鏈，訂單分流風險上升；(3) 生產高度集中於台中精密機械園區，地緣政治（台海）風險下的單一區域集中是重大韌性隱憂；(4) 成長動能依賴手機多攝/潛望/可變光圈升級，景氣隨智慧型手機循環波動；(5) 正向 CPO、車用光學等新領域分散風險。", "facts": [{"fact": "大立光為全球最大智慧型手機相機鏡頭供應商，全球市占 30% 以上，供應 Apple、Samsung 及一線旗艦機。", "verified": "一方稱", "source": "https://barfinex.com/persons/adam-lin-largan"}, {"fact": "2026 年分析指出大立光約 80% 營收仍來自 Apple，外資真正關切的是蘋果單一客戶依賴與新機拉貨持平。", "verified": "已查證", "source": "https://www.ftnn.com.tw/news/576995"}, {"fact": "Morningstar 估計 2023 年大立光供應 Apple 約 80% 的潛望式鏡頭，隨舜宇放量後需分食訂單。", "verified": "已查證", "source": "https://kessler-prod.reta52d8.eas.morningstar.com/stocks/largan-precision-earnings-still-main-beneficiary-camera-upgrades-iphones"}, {"fact": "舜宇光學與玉晶光已進入 Apple 6P/7P 鏡頭供應鏈，大立光面臨訂單分流。", "verified": "一方稱", "source": "https://taiwan.md/es/economy/largan-precision-when-craftsmanship-meets-architectural-revolution/"}, {"fact": "大立光年產能超過 8 億顆鏡頭，佔全球智慧型手機光學元件需求相當大比例。", "verified": "一方稱", "source": "https://dataintelo.com/report/light-diffusion-lens-market"}]}, {"id": "ase", "name_zh": "日月光投控", "name_en": "ASE Technology Holding Co., Ltd.", "ticker": "3711", "category": "封測", "position": "中游偏後段（IC封裝測試OSAT）", "layer": "中游", "segment": "封裝測試(含先進封裝)", "core_products": ["IC封裝（FOCoS、FOPLP、SiP、BGA等先進封裝）", "IC測試（wafer sort、成品測試）", "電子組裝（環旭電子，EMS）", "bumping/COG/COF（DDIC專用）", "AI/HPC先進封裝（對接CoWoS外溢需求）"], "key_customers": ["MediaTek聯發科（最大客戶之一，FOCoS先進封裝）", "Apple蘋果（在台封測主力）", "AMD（FOCoS-Bridge共同投資）", "高通、博通、Nvidia等IC設計大廠", "面板DDIC客戶（聯詠等）"], "key_suppliers": ["晶圓代工廠（承接台積電等晶圓進行後段封測）", "載板/基板材料供應商", "封裝設備與材料商", "其內部整合矽品（SPIL）與環旭電子"], "resilience_relevance": "日月光投控為全球最大IC封測（OSAT）服務廠，由日月光、矽品（SPIL）與環旭電子整合而成，是台灣半導體後段的關鍵韌性節點。其產能高度集中於高雄/桃園等台灣廠區，面臨台海地緣政治與極端氣候風險；為強化韌性，公司持續擴建先進封裝廠（高雄K18B、K28，2025-2026陸續動工），並於2026年併購群創南科Fab 5廠擴充先進封裝產能，承接台積電CoWoS外溢的AI/HPC訂單。客戶面涵蓋聯發科（據稱最大客戶）、蘋果、AMD等，同時於海外（中國、東南亞）布局部分產能以分散地理集中風險；AI需求爆發使其從傳統封測升級為先進封裝關鍵供應者。", "facts": [{"fact": "日月光投控官網說明其結合日月光半導體、矽品精密（SPIL）與環旭電子（環電）三大主體，為全球最大封測服務廠。", "verified": "已查證", "source": "https://www.aseglobal.com/ch/about/"}, {"fact": "2025年10月3日日月光於高雄舉行K18B新廠動土典禮，強化先進封裝競爭力。", "verified": "已查證", "source": "https://ase.aseglobal.com/press-room/k18b-groundbreaking-ceremony/"}, {"fact": "2026年4月日月光投控以約新台幣148億元取得群創光電南科Fab 5廠，擴大先進封裝產能。", "verified": "一方稱", "source": "https://www.pandaroid-info.com/en/news/2044654479651999745"}, {"fact": "新浪財經專題稱日月光以FOCoS為台積電提供CoWoS後段外包服務，最大客戶為聯發科，承接月產能約5至6萬片。", "verified": "一方稱", "source": "https://finance.sina.com.cn/stock/t/2026-08-17/doc-ininruym7705453.shtml.md"}, {"fact": "日月光2025年股東會預測先進封測業務2025年營收年增約10%。", "verified": "一方稱", "source": "https://t.media/2912793"}]}, {"id": "realtek", "name_zh": "瑞昱", "name_en": "Realtek Semiconductor Corp.", "ticker": "2379", "category": "IC設計", "position": "中游（IC設計，fabless）", "layer": "中游", "segment": "網通/周邊IC", "core_products": ["通訊網路IC（Ethernet控制器、交換器/閘道器、Wi-Fi、PON）", "電腦周邊IC（PC Ethernet、HD Audio音訊轉換晶片、讀卡機控制器）", "多媒體IC（LCD監控/TV控制晶片）", "車用與AI加速器/HPC相關連接晶片"], "key_customers": ["PC/NB OEM/ODM（廣達、仁寶等主流伺服器與PC代工體系）", "網通設備商（交換器、路由器、閘道器）", "主機板/周邊品牌", "車用與雲端/HPC伺服器客戶"], "key_suppliers": ["UMC聯電（成熟製程主力外包）", "TSMC台積電（部分先進/特殊製程）", "ASE日月光投控（後段封裝）", "KYEC京元電子（測試，部分）"], "resilience_relevance": "瑞昱為台灣前三大IC設計公司之一，號稱全球PC Ethernet控制器出貨量最大的供應商，屬fabless模式，晶圓製造主要分散外包給聯電（成熟製程）與台積電，形成雙晶圓代工來源以降低產能與價格集中風險。其產品多為成熟製程的連接/周邊晶片，終端分散於PC、網通、車用等市場，景氣波動相對手機SoC平緩；2024-2025年受AI加速器與HPC需求帶動，連接晶片成為成長動能。由於成熟製程產能在台灣集中，仍受台海地緣風險與成熟製程景氣循環影響，雙代工與多終端應用是其主要韌性來源。", "facts": [{"fact": "瑞昱114年（2025）年報指出，上半年受關稅與總體經濟波動影響，惟受惠AI加速器及高效能運算（HPC）需求強勁帶動，半導體產業呈現成長動能。", "verified": "已查證", "source": "https://wwwfile.realtek.com/images/ar/-114-_1.pdf"}, {"fact": "ValueChain整理瑞昱主要供應成本流向UMC聯電（成熟製程外包）與TSMC台積電（晶圓代工外包）等。", "verified": "一方稱", "source": "https://valuechain.wiki/realtek?lang=en"}, {"fact": "瑞昱為全球PC Ethernet控制器出貨量最大的供應商，產品分通訊網路、電腦周邊、多媒體三大類。", "verified": "一方稱", "source": "https://leonardo-boquillon.com/ai-semiconductor-companies"}, {"fact": "聯電（UMC）成熟/特殊製程（28/40/65nm）旗艦客戶群包含高通、聯發科、博通、TI與瑞昱。", "verified": "一方稱", "source": "https://valuechain.wiki/umc?lang=en"}]}, {"id": "innolux", "name_zh": "群創光電", "name_en": "Innolux Corporation", "ticker": "3481", "category": "面板", "position": "中游（面板製造／顯示器供應商）", "layer": "中游", "segment": "面板", "core_products": ["電視面板（大尺寸 65/75 吋）", "筆記型電腦面板", "車用面板（2026Q1 佔營收 42%）", "桌面顯示器面板", "手機/消費性面板", "工業顯示"], "key_customers": ["鴻海 Foxconn（集團垂直整合，供 Apple MacBook Air 等）", "電視品牌：Samsung 等", "筆電品牌：華碩、宏碁", "車用 Tier-1"], "key_suppliers": ["玻璃基板、偏光板", "驅動 IC、LED 晶粒"], "resilience_relevance": "群創為全球大尺寸 LCD 前五大廠（2025H1 約 9.5%），且為鴻海集團成員，具獨特的垂直整合韌性特徵。其韌性關鍵在於：(1) 身為鴻海子公司，鴻海垂直整合上游面板、下游組裝 Apple/Sony 裝置，形成集團內供應鏈，但也意味著與 Apple 訂單綁定更深；(2) 台南園區為全球最大單一城市非 OLED 筆電顯示生產集中地，台海地緣風險下區域集中極高；(3) 同受面板 Boom-Bust 循環與中國京東方/TCL 華星擴產擠壓；(4) 積極轉型車用（2026Q1 車用佔營收 42%）以降低消費面板循環暴露；(5) 記憶體漲價對筆電/手機面板獲利構成新壓力。", "facts": [{"fact": "2025 年 1-6 月全球大尺寸 LCD 市占（看出貨面積）：群創約 9.5%，居全球第四。", "verified": "已查證", "source": "https://pdf.dfcfw.com/pdf/H3_AP202508191730254504_1.pdf?1755592898000.pdf"}, {"fact": "群創為鴻海（Foxconn）集團成員，鴻海垂直整合上游面板與下游 Apple iPhone/iPad、Sony PlayStation 組裝。", "verified": "已查證", "source": "https://policyrisk.com/supplymap/company/innolux-corporation"}, {"fact": "群創台南園區為全球最大單一城市非 OLED 筆電顯示生產集中地，群創面板用於 MacBook Air 機型。", "verified": "一方稱", "source": "https://policyrisk.com/supplymap/computers-and-laptops"}, {"fact": "2026 年 Q1 群創依產品應用營收占比：車用面板 42%、電視 25%、手機及消費 17%、筆電 13%、桌面 3%。", "verified": "一方稱", "source": "https://www.eet-china.com/mp/a494518.html"}, {"fact": "群創 2026 年 5 月營收月減 2.78%、年增 10.28%；管理層指出記憶體高漲將影響筆電/手機面板。", "verified": "已查證", "source": "https://www.emsodm.com/html/2026/06/12/1781231795905.html"}]}, {"id": "mediatek", "name_zh": "聯發科", "name_en": "MediaTek Inc.", "ticker": "2454", "category": "IC設計", "position": "中游（IC設計，fabless）", "layer": "中游", "segment": "手機SoC/網通/ASIC", "core_products": ["智慧手機SoC（Dimensity天璣系列）", "智慧裝置/家居晶片（Chromecast、TV、IoT）", "車用電子（Dimensity Auto、與NVIDIA合作CX-1車載平台）", "寬頻連網晶片（Wi-Fi、5G數據機）", "ASIC/AI邊緣運算晶片"], "key_customers": ["Samsung（中階機種）", "Xiaomi（Redmi/中高階，2024Q3占聯發科手機出貨約23%）", "OPPO、vivo（Dimensity 9400旗艦機種）", "realme、Motorola、Nokia、LG", "Transsion傳音（新興市場）", "華為（禁令前供應，現已受限）"], "key_suppliers": ["TSMC台積電（先進製程主力：3nm量產、2nm N2P已tape-out）", "UMC聯電（成熟/特殊製程備援，雙供應分散風險）", "ASE日月光投控（後段封裝）", "KYEC京元電子（晶圓/成品測試）", "ARM（IP授權）、EDA工具商"], "resilience_relevance": "聯發科為純IC設計（fabless）公司，本身不持有晶圓廠，產能完全仰賴外部晶圓代工，因此對台積電先進製程的產能配置高度集中，是其供應鏈韌性的核心弱點；公司以台積電為先進製程主力、並將部分成熟/車用製程分散至聯電等第二供應商，形成多晶圓代工策略以降低單一廠商與單一地理（台灣）集中風險。客戶面橫跨三星、小米、OPPO、vivo等全球手機品牌，2024年手機SoC出貨量市占居全球第一（Canalys約40%），客戶分散度高，但終端需求受智慧手機景氣循環與中國品牌市占波動影響大。地緣政治上，華為禁令使其失去部分中國市場訂單，並面臨中美科技戰對先進製程取得的潛在限制；近年積極拓展車用（Dimensity Auto）與AI ASIC新業務以分散終端風險。", "facts": [{"fact": "2025年9月聯發科宣布其旗艦SoC採用台積電2nm（N2P）製程完成設計定案（tape-out），為首批與台積電合作2nm的客戶之一，預期2026年底量產。", "verified": "已查證", "source": "https://www.mediatek.com/zh-tw/press-room/mediatek-develops-chip-utilizing-tsmcs-2nm-process-achieving-milestones-in-performance-and-power-efficiency"}, {"fact": "據Canalys，2024年第2季全球智慧手機處理器出貨量市占：聯發科約40%居首，高通約25%，蘋果約16%。", "verified": "已查證", "source": "https://finance.sina.cn/2024-09-03/detail-incmwrzh0147537.d.html"}, {"fact": "聯發科在2024年法說會指出OPPO、vivo採用Dimensity 9400的AI手機獲市場高度認可，2024年旗艦SoC收入較前一年成長逾70%、倍增。", "verified": "已查證", "source": "https://www.mediatek.com/hubfs/MediaTek%20Assets/Pdfs/Quarterly%20Earnings%20Release/2024/Quarterly%20Earnings%20Release-2024Q4/Transcript.pdf?hsLang=en"}, {"fact": "京元電子投資人簡報將聯發科列為其客戶（標記*），2025年聯發科在全球半導體廠排名第10。", "verified": "已查證", "source": "https://www.kyec.com.tw/Upfiles/EDUp/files/%E6%8A%95%E8%B3%87%E4%BA%BA%E9%97%9C%E4%BF%82/%E6%AF%8F%E5%AD%A3%E7%87%9F%E9%81%8B%E5%A0%B1%E5%91%8A/KYEC(2449)_2Q26%20Investor%20update_English.pdf"}, {"fact": "有印度媒體報導聯發科除台積電外，亦將部分委外製造分散至Intel Foundry Services與GlobalFoundries，並對印度製造開放。", "verified": "一方稱", "source": "https://techone.scooppunjab.com/taiwanese-mediatek-open-to-get-chips-made-in-india/"}, {"fact": "2024年第3季聯發科手機晶片出貨前三大貢獻客戶為小米（約23%）、三星（約21%）、OPPO（約16%）。", "verified": "一方稱", "source": "https://www.smbom.com/news/14437"}]}, {"id": "novatek", "name_zh": "聯詠", "name_en": "Novatek Microelectronics Corp.", "ticker": "3034", "category": "IC設計", "position": "中游（IC設計，fabless）", "layer": "中游", "segment": "顯示驅動IC", "core_products": ["TFT-LCD顯示驅動IC（DDIC，大尺寸TV/Monitor/NB）", "OLED驅動IC/TDDI（手機、NB用）", "TCON時序控制IC", "類比/電源管理IC、CIS相關", "HPC/邊緣伺服器ASIC服務（TSMC 4nm、chiplet）"], "key_customers": ["面板廠：BOE京東方、TCL華星光電、天馬、AUO友達、Innolux群創", "Samsung Display、LG Display、Visionox維信諾", "Apple iPhone OLED DDI供應（2024年起切入）", "TV/Monitor/OEM品牌與車用Tier-1"], "key_suppliers": ["TSMC台積電（先進製程，如4nm ASIC、OLED DDIC）", "UMC聯電（成熟製程DDIC主力）", "ASE日月光投控（DDIC封裝/bumping/COG/COF）", "KYEC京元電子（測試，部分）"], "resilience_relevance": "聯詠為全球大尺寸TFT-LCD驅動IC龍頭，屬fabless設計公司，產能仰賴台積電與聯電的成熟/先進製程，其中DDIC主力為成熟製程，分散於台系晶圓廠以爭取產能配置。其終端需求高度集中於面板廠，且超過五成營收來自中國市場（BOE、TCL CSOT、天馬等），存在明顯的地理與客戶集中風險；在地緣政治上，中國本土DDIC廠商有國家策略誘因將聯詠導出供應鏈，是其中長期韌性挑戰。2024年起聯詠切入Apple iPhone OLED DDI供應鏈、打破韓國供應商壟斷，同時開發TSMC 4nm ASIC（HPC/邊緣伺服器）以多角化分散對面板景氣循環的依賴。", "facts": [{"fact": "聯詠官網自稱為全球領先的顯示IC完整方案供應商，是TFT LCD顯示器主要的驅動IC供應商之一。", "verified": "已查證", "source": "https://www.novatek.com.tw/en-global/Home/Index"}, {"fact": "DIGITIMES報導，2024年聯詠切入Apple iPhone OLED顯示驅動IC（DDI）訂單，瓜分原由韓國LX Semicon獨占的份額。", "verified": "已查證", "source": "https://apps.digitimes.com/news/a20241017PD225/lx-semicon-lgd-novatek-iphone-ddi.html"}, {"fact": "聯詠官網里程碑揭露其採用TSMC 4nm製程、搭配chiplet先進封裝技術開發HPC/邊緣伺服器ASIC，並推出55nm製程OLED NB DDIC。", "verified": "已查證", "source": "https://www.novatek.com.tw/zh-TW/Milestone/aboutus_milestones"}, {"fact": "聯詠下游面板客戶涵蓋BOE、TCL CSOT、天馬、AUO、Innolux、Samsung Display、LG Display、Visionox等。", "verified": "一方稱", "source": "https://menfem.com/companies/novatek"}, {"fact": "分析指出聯詠核心DDIC產品逾五成終端需求來自中國市場，成本優勢仰賴外部晶圓廠產能配置。", "verified": "一方稱", "source": "https://menfem.com/companies/novatek"}]}, {"id": "walsin", "name_zh": "華新科", "name_en": "Walsin Technology Corporation", "ticker": "2492", "category": "關鍵零組件", "position": "上游（被動元件供應商）", "layer": "中游", "segment": "被動元件(MLCC/電阻)", "core_products": ["積層陶瓷電容 MLCC", "晶片電阻（厚膜/薄膜）", "釺性電容、鉭質電容、薄膜電容", "電感", "RF/LTCC 元件與天線模組", "EMI 濾波器"], "key_customers": ["PC/周邊與電源供應商（EMS/OEM）", "車用電子（AEC-Q200 認證）", "通訊與消費性電子品牌"], "key_suppliers": ["陶瓷粉體材料供應鏈", "被動元件設備廠"], "resilience_relevance": "華新科為台灣第二大被動元件廠，產品涵蓋 MLCC、晶片電阻、RF/天線，與國巨同受被動元件景氣循環主導。其韌性關鍵在於：(1) 2024 年全球 MLCC 市占約 3.2%，位居全球前七、台廠第二，規模僅次國巨，議價能力相對弱於村田/三星；(2) 同樣經歷 2017-2018 缺貨漲價與 2023 庫存修正循環；(3) 積極布局車用（AEC-Q200）與電源應用，試圖降低對消費電子循環的暴露；(4) 產能集中台灣與中國，受兩岸地緣與關稅政策影響。", "facts": [{"fact": "華新科產品組合涵蓋 MLCC、晶片電阻、薄膜電阻、電感、RF LTCC、天線開關模組、EMI 濾波器。", "verified": "已查證", "source": "https://www.passivecomponent.com/applications/power-supply/"}, {"fact": "2024 年按金額口徑，華新科全球 MLCC 市占約 3.2%，為台廠第二、全球前七。", "verified": "一方稱", "source": "https://wap.seccw.cn/wap.php/Index/detail/id/50230.html"}, {"fact": "華新科提供通過 AEC-Q200 認證的車用 MLCC 與薄膜晶片電阻，布局車用電子。", "verified": "已查證", "source": "https://www.passivecomponent.com/applications/power-supply/"}, {"fact": "華新科為 PC/周邊與電源供應應用提供全系列 MLCC（0201-1812，0.1pF~220uF）。", "verified": "已查證", "source": "https://www.passivecomponent.com/applications/pc-peripheral/"}]}, {"id": "compal", "name_zh": "仁寶電腦工業", "name_en": "Compal Electronics, Inc.", "ticker": "2324", "category": "EMS 電子代工", "position": "中游", "layer": "下游", "segment": "筆電ODM+車電", "core_products": ["筆記型電腦", "智慧裝置(穿戴裝置/智慧手機)", "雲端伺服器(AI 伺服器)", "汽車電子", "智慧醫療"], "key_customers": ["Dell", "Lenovo", "Apple(iPad)", "HP", "Microsoft"], "key_suppliers": ["Intel/AMD(CPU)", "NVIDIA(GPU)", "TSMC(IC)", "AUO/Innolux(面板)", "Delta(電源)", "Yageo/Walsin(被動元件)"], "resilience_relevance": "仁寶是全球前二大筆電 ODM(2026 年筆電出貨估約 2027 萬台，僅次廣達)，客戶涵蓋 Dell、Lenovo、Apple(iPad)等大品牌，呈典型分散客戶但集中於 PC 週期的結構。為因應 AI 需求與歐洲電動車供應鏈，仁寶在台灣大溪新建 AI 伺服器製造中心(2026)、波蘭新建車用電子廠(2025)，呈現『傳統筆電+新興 AI/車電』的雙引擎布局，以地理多元化(中國+東南亞+波蘭)緩解台海與關稅風險。", "facts": [{"fact": "仁寶 2025 年第二季合併營收達新台幣 1,804.43 億元，筆電出貨較上季成長 2%。", "verified": "已查證", "source": "https://www.compal.com/zh-hans/media/280/ren-bao-dian-nao-min-guo-114nian-di-er-ji-ying-yun"}, {"fact": "DIGITIMES 預估 2026 年台灣四大筆電 ODM 出貨：廣達約 4414 萬台、仁寶約 2027 萬台、緯創約 1885 萬台、英業達約 1262 萬台。", "verified": "一方稱", "source": "http://m.toutiao.com/group/7694615384279876134/"}, {"fact": "仁寶 2026 年啟用大溪 AI 伺服器製造中心，強化全球 AI 製造布局。", "verified": "已查證", "source": "https://www.compal.com/en-us/media/343/ren-bao-da-xi-aisi-fu-qi-zhi-zao-zhong-xin-zheng"}, {"fact": "仁寶 2025 年完成波蘭汽車電子新廠，做為歐洲車用供應基地。", "verified": "已查證", "source": "https://www.compal.com/zh-hans/media/277/ren-bao-xuan-bu-bo-lan-qi-che-dian-zi-xin-chang-di"}, {"fact": "仁寶主要品牌客戶包括 Dell、Lenovo 與 Apple(iPad 組裝)。", "verified": "一方稱", "source": "無公開來源，待確認"}]}, {"id": "pegatron", "name_zh": "和碩聯合科技", "name_en": "Pegatron Corporation", "ticker": "4938", "category": "EMS 電子代工", "position": "中游", "layer": "下游", "segment": "消費電子組裝+車電", "core_products": ["智慧型手機(iPhone)組裝", "筆記型電腦", "主機板與顯示卡", "遊戲主機與手持裝置", "寬頻通訊產品", "車用電子(含 Tesla 中控)"], "key_customers": ["Apple(iPhone 第二大組裝夥伴)", "Tesla(Model 3 中控系統)", "Microsoft(遊戲主機)", "ASUS(關係企業/品牌代工)"], "key_suppliers": ["Apple 指定零組件(面板/處理器/鏡頭)", "TSMC(IC)", "AUO/Innolux(面板)", "Largan(鏡頭)", "中國本地零組件供應商"], "resilience_relevance": "和碩 2008 年自華碩集團分割而來，專職代工，是 Apple 僅次於鴻海的第二大 iPhone 組裝商，客戶集中度高。在鄭州 COVID 封城後，和碩亦加速印度(Tamil Nadu/Hosur)布局；2024 年 11 月與 Tata Electronics 完成合資(Tata 持股 60%)，將印度 iPhone 廠經營權移交，反映台廠在中國以外分散產能、同時在地化合資的趨勢。和碩亦切入 Tesla 中國供應鏈(Model 3 中控系統)，受中美關稅與台海議題雙重影響。", "facts": [{"fact": "和碩 2008 年由華碩策略性分割成立，專注 OEM/ODM 製造業務。", "verified": "已查證", "source": "https://www.pcbasic.com/blog/top_contract_manufacturing_global.html"}, {"fact": "和碩為 Apple 在印度的第二大 iPhone 組裝夥伴，其印度廠約占 Apple 印度 iPhone 產出的 10%。", "verified": "已查證", "source": "https://startupnews.fyi/2024/02/02/tata-eyes-jv-with-pegatron-for-setting-up-iphone-assembly-plant-in-tn-2/"}, {"fact": "Tata Electronics 與和碩於 2024 年 11 月完成印度 iPhone 廠合資，Tata 持股 60%、和碩保留 40%。", "verified": "已查證", "source": "https://www.forbesindia.com/amp/article/news/tata-group-completes-jv-with-taiwans-pegatron/94636/2"}, {"fact": "和碩供應 Tesla Model 3 中控系統，並曾評估在美國設廠服務 Tesla。", "verified": "一方稱", "source": "https://news.metal.com/newscontent/101343828/a-big-expansion-of-production-teslas-demand-for-spare-parts-increases/"}, {"fact": "和碩與華碩同屬昔日集團分割，和碩為華碩品牌產品的重要代工/製造夥伴。", "verified": "已查證", "source": "https://taiwan.md/id/economy/pegatron-the-invisible-manufacturing-giant/"}]}, {"id": "acer", "name_zh": "宏碁股份有限公司", "name_en": "Acer Inc.", "ticker": "2353", "category": "品牌", "position": "下游", "layer": "下游", "segment": "PC品牌", "core_products": ["筆記型電腦(Aspire/Swift)", "桌上型電腦", "電競品牌(Predator)", "顯示器與投影機", "資訊服務與新事業(EV/綠能/雲端)"], "key_customers": ["全球終端消費者與中小企業", "教育市場", "通路零售體系"], "key_suppliers": ["廣達/仁寶/緯創/英業達等 ODM 代工夥伴", "Intel/AMD/ NVIDIA(CPU/GPU)", "AUO/Innolux(面板)", "Yageo/Walsin(被動元件)", "Delta(電源)"], "resilience_relevance": "宏碁是最下游品牌 PC 大廠，本身幾無自有組裝廠，高度仰賴廣達、仁寶、緯創、英業達等 ODM 的產能與調度，因此供應鏈韌性表現在：上游零組件(面板、IC)缺料時的分配议价能力、終端需求轉弱時的庫存去化速度，以及在『多引擎』策略下拓展電競(Predator)、EV、綠能等非 PC 業務以分散風險。", "facts": [{"fact": "宏碁 FY2024 稅後淨利新台幣 55.4 億元，每股現金股利 1.7 元。", "verified": "已查證", "source": "https://news.acer.com/acer-reports-fy2024-net-income-of-nt554-billion-and-nt17-cash-dividend-per-share"}, {"fact": "宏碁採『多引擎』策略，持續擴充 PC 以外的新事業引擎。", "verified": "已查證", "source": "https://news.acer.com/acer-reports-fy2024-net-income-of-nt554-billion-and-nt17-cash-dividend-per-share"}, {"fact": "宏碁為下游品牌廠，主要客戶為全球終端消費者與企業，PC 產品多由廣達/仁寶/緯創/英業達等 ODM 代工。", "verified": "一方稱", "source": "無公開來源，待確認"}]}, {"id": "quanta", "name_zh": "廣達電腦", "name_en": "Quanta Computer Inc.", "ticker": "2382", "category": "EMS 電子代工", "position": "中游", "layer": "下游", "segment": "筆電ODM+AI伺服器", "core_products": ["筆記型電腦(MacBook 等)", "AI 伺服器與機架系統(QCT)", "雲端資料中心設備", "智慧家庭與消費電子", "汽車電子(Smart Mobility)", "AIoT 與智慧醫療"], "key_customers": ["Apple(MacBook 主力代工)", "NVIDIA(GB 系列 AI 機櫃)", "Meta", "Microsoft", "Google", "Amazon(AWS)", "Dell", "HP", "Lenovo"], "key_suppliers": ["NVIDIA(GPU)", "Intel/AMD(CPU)", "TSMC(IC)", "AUO/Innolux(面板)", "Delta(電源/散熱)", "Yageo/Walsin(被動元件)"], "resilience_relevance": "廣達長期是全球筆電代工龍頭，近年因 AI 資料中心需求暴增快速轉型：旗下 QCT 已成為與鴻海並列的全球前兩大 AI 伺服器組裝商，ODM Direct 直供 hyperscaler。其韌性意義在於客戶結構由消費性筆電(週期性強)轉向資料中心長約訂單(Google/Meta/Microsoft)，降低了 PC 景氣波動風險；但同時加深對 NVIDIA GPU 供貨與美國 CSP 資本支出的依賴。生產基地集中於上海松江與重慶兩大製造城，亦隨客戶需求布局墨西哥、美國等海外產能。", "facts": [{"fact": "廣達為《財富》全球 500 大，是全球筆記型電腦領導研發設計製造商，也是 AI 伺服器領先方案商。", "verified": "已查證", "source": "https://www.quantatw.com/quanta/english/about/company.aspx"}, {"fact": "廣達 AI 伺服器營收快速成長，筆電占總銷售比重已降至不到 20%(2026 年報導)。", "verified": "一方稱", "source": "https://t.media/3177453"}, {"fact": "廣達 2025 年約 70% 的營收預期來自伺服器，且多數伺服器需求來自 AI 應用。", "verified": "一方稱", "source": "https://thedailybrief.zerodha.com/p/from-iphones-to-ai-servers"}, {"fact": "DIGITIMES 統計廣達 ODM Direct 雲端客戶滲透率：Google 約 45.1%、Meta 約 45%、Microsoft 約 31.1%、Amazon 約 19.6%(2024 年)。", "verified": "一方稱", "source": "https://www.athsinchu.com/post/241231-aiserver"}, {"fact": "廣達主要客戶涵蓋 Apple、HP、Dell、Lenovo、Microsoft、Google、AWS、Meta、NVIDIA。", "verified": "一方稱", "source": "https://www.aiwiki.ai/wiki/quanta_computer"}, {"fact": "鴻海與廣達共同包攬了蘋果大部分電腦(Mac)訂單。", "verified": "已查證", "source": "https://www.caixin.com/2023-03-15/102008517.html"}]}, {"id": "wistron", "name_zh": "緯創資通", "name_en": "Wistron Corporation", "ticker": "3231", "category": "EMS 電子代工", "position": "中游", "layer": "下游", "segment": "筆電+AI伺服器", "core_products": ["筆記型電腦", "AI 伺服器(集團旗下緯穎 Wiwynn)", "企業儲存設備", "汽車電子", "網路通訊產品", "智慧裝置"], "key_customers": ["Dell", "NVIDIA(AI 伺服器合作夥伴)", "HPE", "Lenovo", "HP", "Microsoft(雲端)"], "key_suppliers": ["NVIDIA(GPU)", "Intel/AMD(CPU)", "TSMC(IC)", "AUO/Innolux(面板)", "Delta(電源散熱)"], "resilience_relevance": "緯創是台灣 PC ODM 四強之一，近年積極『淡出 iPhone 組裝、轉向 AI 伺服器』：2023 年宣布、2024 年 3 月完成以 1.308 億美元將印度 Karnataka iPhone 廠出售給 Tata Electronics，正式退出 Apple 手機組裝。此轉型使其更聚焦 Dell/NVIDIA/HPE 等企業級客戶與 AI 伺服器(集團旗下緯穎 Wiwynn 為雲端 ODM 要角)，降低消費電子與 Apple 單一客戶依賴，是 EMS 廠因應地緣與 AI 需求重新配置資源的代表性案例。", "facts": [{"fact": "緯創 2024 年 3 月完成將 Wistron InfoComm Manufacturing (India) 出售予 Tata Electronics，交易金額 1.308 億美元。", "verified": "已查證", "source": "https://www.wistron.com/en/Newsroom/2024-05-13"}, {"fact": "緯創董事會 2023 年 10 月通過出售印度 WMMI 100% 間接持股予 Tata Electronics。", "verified": "已查證", "source": "https://www.wistron.com/en/Newsroom/2023-10-27"}, {"fact": "Tata 收購緯創印度廠後成為首家印度本土 iPhone 製造商。", "verified": "已查證", "source": "https://appleinsider.com/articles/23/10/30/ta-ta-wistron-indian-iphone-operations-go-local"}, {"fact": "凱基證券估緯創 AI 伺服器營收 2023 年成長 50-100%，2024 年預估再翻倍以上。", "verified": "一方稱", "source": "https://www.kgi.com.hk/zh-cn/-/media/files/kgishk/research-reports/tw-reports/2024/01/wistron_3231-tt_15032024.pdf"}, {"fact": "緯創被 NVIDIA 列為 AI 工廠/資料中心合作組裝廠之一。", "verified": "已查證", "source": "https://investor.nvidia.com/news/press-release-details/2024/Computer-Industry-Joins-NVIDIA-to-Build-AI-Factories-and-Data-Centers-for-the-Next-Industrial-Revolution/default.aspx"}]}, {"id": "inventec", "name_zh": "英業達股份有限公司", "name_en": "Inventec Corporation", "ticker": "2356", "category": "EMS 電子代工", "position": "中游", "layer": "下游", "segment": "伺服器+筆電", "core_products": ["企業級/AI 伺服器", "筆記型電腦", "無線通訊裝置", "智慧裝置與物聯網", "車電 5G V2X"], "key_customers": ["HPE(慧與)", "Dell", "NVIDIA(GB200/GB300 AI 伺服器)", "Microsoft", "美國 CSP 雲端客戶"], "key_suppliers": ["NVIDIA(GPU/HGX 平台)", "Intel/AMD(CPU)", "TSMC(IC)", "AUO/Innolux(面板)", "Delta(電源/液冷)"], "resilience_relevance": "英業達長期是全球前四大伺服器 ODM，據其引用 IDC 2023 數據，全球約每五台伺服器就有一台由英業達組裝(市占約 20-25%)。其韌性議題集中在：高度依賴美國伺服器品牌(HPE、Dell)與 CSP 訂單、近年受 NVIDIA GB200/GB300 訂單分配影響大(傳聞 GB300 份額約 20%、較 GB200 提升)；生產基地以中國(上海/南京)為主並擴張台灣與海外，AI 伺服器液冷與高階機櫃製造能力是其承接需求的關鍵韌性資產。", "facts": [{"fact": "據 2023 年 IDC 數據，全球約每五台伺服器就有一台出自英業達，市占約 20-25%。", "verified": "已查證", "source": "https://ebg.inventec.com/cn/news/%E6%96%B0%E9%97%BB%E4%B8%8E%E5%85%AC%E5%91%8A/2024/67"}, {"fact": "英業達 2024 年 4 月發表基於 NVIDIA HGX AI 平台的 P8000IG6 伺服器，定位 AI/HPC 工作負載。", "verified": "已查證", "source": "https://ebg.inventec.com/en/news/Press%20Release/2024/81"}, {"fact": "英業達被 NVIDIA 列為 AI 工廠合作組裝廠(與鴻海、廣達 QCT、緯創等並列)。", "verified": "已查證", "source": "https://investor.nvidia.com/news/press-release-details/2024/Computer-Industry-Joins-NVIDIA-to-Build-AI-Factories-and-Data-Centers-for-the-Next-Industrial-Revolution/default.aspx"}, {"fact": "傳聞 NVIDIA GB300 訂單份額：鴻海約 40%、廣達約 25%、英業達約 20%，英業達份額較 GB200 時期提升。", "verified": "一方稱", "source": "http://www.hansenfluid.com/dc/inventec.htm"}, {"fact": "英業達長期為 HPE 與 Dell 伺服器 ODM 代工夥伴。", "verified": "一方稱", "source": "無公開來源，待確認"}]}, {"id": "asus", "name_zh": "華碩電腦", "name_en": "ASUSTeK Computer Inc.", "ticker": "2357", "category": "品牌", "position": "下游", "layer": "下游", "segment": "主機板/PC/電競", "core_products": ["主機板(全球市占第一)", "筆記型電腦(含 ROG 電競/ZenBook)", "顯示卡與螢幕", "ROG 電競手機與掌機", "路由器與網通產品", "桌上型電腦"], "key_customers": ["全球終端消費者與電競玩家", "企業/教育市場", "通路商與零售體系"], "key_suppliers": ["和碩(關係企業/代工夥伴)", "廣達/仁寶等 ODM", "Intel/AMD/ NVIDIA(CPU/GPU)", "AUO/Innolux(面板)", "Yageo/Walsin(被動元件)", "Delta(電源)"], "resilience_relevance": "華碩是最下游品牌廠，直接面對終端需求波動與 PC 庫存調整循環(2022-2023 年 PC 去庫存即重創獲利)。其韌性策略是品牌垂直整合：2008 年將代工部門分割為和碩，自身保留研發與品牌，並透過 ROG 電競等高毛利產品線分散消費性 PC 週期；零組件高度倚賴 Intel/AMD/NVIDIA 與面板雙雄(AUO/群創)，台海生產集中且受美中晶片出口管制影響。", "facts": [{"fact": "華碩 1989 年成立，以全球最好的主機板、高階 PC、螢幕與顯示卡聞名。", "verified": "已查證", "source": "https://www.asus.com/fi/content/about_asus_history/"}, {"fact": "和碩 2008 年自華碩集團分割，專注代工，與華碩維持密切關係企業與代工夥伴關係。", "verified": "已查證", "source": "https://www.pcbasic.com/blog/top_contract_manufacturing_global.html"}, {"fact": "華碩公布 FY2024 主要供應商名單，涵蓋材料、製造與組裝供應商。", "verified": "已查證", "source": "https://esg.asus.com/files/documents/ASUS_Supplier_List.pdf"}, {"fact": "華碩為典型下游品牌廠，主要客戶為全球終端消費者與企業，直接承受 PC 終端需求與庫存調整循環。", "verified": "一方稱", "source": "無公開來源，待確認"}]}, {"id": "foxconn", "name_zh": "鴻海精密工業", "name_en": "Hon Hai Precision Industry Co., Ltd. (Foxconn Technology Group)", "ticker": "2317", "category": "EMS 電子代工", "position": "中游", "layer": "下游", "segment": "消費電子組裝+AI伺服器", "core_products": ["智慧型手機(iPhone)組裝", "AI 伺服器與機櫃(NVIDIA GB 系列)", "消費電子與穿戴裝置", "電動車(EV)整車與零組件", "通訊網路設備", "半導體與光電零組件"], "key_customers": ["Apple(iPhone/Mac/iPad 最大組裝夥伴)", "NVIDIA(GB200/GB300 NVL72 AI 機櫃)", "Meta", "Amazon(AWS)", "Microsoft", "Tesla"], "key_suppliers": ["TSMC(台積電,IC 製造)", "AUO/Innolux(面板)", "Largan(大立光,鏡頭)", "Yageo/Walsin(國巨/華新科,被動元件)", "Delta(台達電,電源)", "大量中國本地零組件供應商"], "resilience_relevance": "鴻海是蘋果供應鏈與全球 AI 伺服器的雙重錨點。客戶集中度極高(Apple 與 NVIDIA 佔營收大宗)，生產曾高度集中於中國(尤其鄭州『iPhone 城』承擔約八成 iPhone 產能)；2022 年 11 月鄭州 COVID 封控導致 iPhone 14 Pro 出貨大幅下修，是供應鏈韌性研究的標準案例，此後加速『China+1』布局：印度 Chennai 廠已成印度最大 iPhone 出口基地、越南與墨西哥(Chihuahua)產能持續擴充。AI 伺服器方面鴻海稱握有全球逾四成市占，為 NVIDIA GB200/GB300 NVL72 主力組裝商，並於美國 Houston 設 AI 伺服器廠，受地緣政治與關稅議題直接影響。", "facts": [{"fact": "鴻海是蘋果最大代工合作夥伴，包攬幾乎全部高端 iPhone 訂單與過半 iPad 訂單(2023 年資料)。", "verified": "已查證", "source": "https://www.caixin.com/2023-03-15/102008517.html"}, {"fact": "2022 年 11 月鄭州廠因 COVID 防疫措施『產能大幅減少』，蘋果官方警告 iPhone 14 Pro/Pro Max 出貨將受影響。", "verified": "已查證", "source": "https://www.foxconn.com/en-us/press-center/press-releases/latest-news/921"}, {"fact": "鄭州廠被稱為『iPhone City』，約承擔全球 80% 的 iPhone 生產。", "verified": "一方稱", "source": "https://www.mymobileindia.com/iphone-16-news-roundup-production-in-full-swing-new-iphone-16-dummies-leaked-in-hands-on-video-korea-to-be-a-launch-country/amp/"}, {"fact": "鴻海稱持有全球逾 40% 的 AI 伺服器市場，是 NVIDIA GB200 NVL72 與 GB300 NVL72 架構的主要供應商(2025 年 5 月)。", "verified": "已查證", "source": "https://www.foxconn.com/en-us/press-center/events/foxconn-events/1601"}, {"fact": "鴻海印度 Chennai 廠為印度最大 iPhone 出口基地，約占印度 iPhone 出口一半，2024 年印度組裝約 1200 萬支 iPhone。", "verified": "已查證", "source": "https://fortune.com/asia/2024/10/29/apple-ships-6-billion-of-iphones-from-india-in-big-china-shift/"}, {"fact": "截至 2024 年 3 月的會計年度，鴻海與和碩分別組裝了印度約 67% 與 17% 的 iPhone。", "verified": "一方稱", "source": "https://www.phonearena.com/news/apple-foxconn-save-up-to-50-million-per-year_id160866"}]}], "relations": [{"from": "tsmc", "to": "apple", "type": "晶圓代工", "detail": "Apple A/M 系列 SoC 由台積電先進製程獨家代工，2025 年 Apple 約占台積營收 17%。", "verified": "一方稱", "source": "https://www.theteardown.co/tsmc"}, {"from": "tsmc", "to": "nvidia", "type": "晶圓代工", "detail": "NVIDIA GPU/AI 加速器由台積電先進製程與 CoWoS 封裝生產，2025 年成為台積最大客戶約 19%。", "verified": "一方稱", "source": "https://www.theteardown.co/tsmc"}, {"from": "tsmc", "to": "amd", "type": "晶圓代工", "detail": "AMD CPU/GPU 由台積電先進製程代工。", "verified": "已查證", "source": "https://valuechain.wiki/tsmc?lang=en"}, {"from": "tsmc", "to": "qualcomm", "type": "晶圓代工", "detail": "Qualcomm Snapdragon 系列由台積電先進製程為主要代工夥伴。", "verified": "一方稱", "source": "https://valuechain.wiki/tsmc?lang=en"}, {"from": "tsmc", "to": "broadcom", "type": "晶圓代工", "detail": "Broadcom ASIC/網通晶片由台積電先進製程代工。", "verified": "一方稱", "source": "https://valuechain.wiki/tsmc?lang=en"}, {"from": "tsmc", "to": "intel", "type": "晶圓代工", "detail": "Intel 部分消費/連網晶片委託台積電代工。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "tsmc", "to": "mediatek", "type": "晶圓代工", "detail": "MediaTek 全數晶圓生產約 90% 以上委由台積電先進製程，2025/9 完成首顆 2nm N2P 晶片流片。；聯發科先進製程（3nm量產、2nm N2P已tape-out）主力由台積電代工生產。", "verified": "已查證", "source": "https://www.mediatek.com/press-room/mediatek-develops-chip-utilizing-tsmcs-2nm-process-achieving-milestones-in-performance-andpower-efficiency?hs_amp=true"}, {"from": "tsmc", "to": "novatek", "type": "晶圓代工", "detail": "聯詠採用台積電4nm先進製程開發HPC/邊緣伺服器ASIC，並用於部分OLED DDIC。", "verified": "已查證", "source": "https://www.novatek.com.tw/zh-TW/Milestone/aboutus_milestones"}, {"from": "tsmc", "to": "realtek", "type": "晶圓代工", "detail": "瑞昱高速網通/儲存控制器部分由台積電先進製程代工。；瑞昱部分先進/特殊製程晶片委由台積電代工。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "umc", "to": "mediatek", "type": "晶圓代工", "detail": "聯電為聯發科成熟/特殊製程（如天橋、連網晶片）代工夥伴之一。；聯發科將部分成熟/車用製程分散至聯電，做為台積電之外的第二供應商以降低集中風險。", "verified": "已查證", "source": "https://www.morningstar.com/stocks/xnys/umc/quote?category=earnings&date=2026-04-22"}, {"from": "umc", "to": "novatek", "type": "晶圓代工", "detail": "聯電為聯詠中低階 OLED 驅動 IC 主要代工夥伴。；聯詠主力DDIC成熟製程（如22/28/40nm等）由聯電等台系成熟製程晶圓廠代工。", "verified": "已查證", "source": "https://www.docin.com/touch_new/preview_new.do?id=4899925446"}, {"from": "umc", "to": "realtek", "type": "晶圓代工", "detail": "瑞昱為聯電成熟製程客戶之一。；瑞昱成熟製程連接/周邊晶片主要委由聯電代工。", "verified": "已查證", "source": "https://www.morningstar.com/stocks/xnys/umc/quote?category=earnings&date=2026-04-22"}, {"from": "umc", "to": "qualcomm", "type": "晶圓代工", "detail": "Qualcomm 部分成熟製程訂單由聯電代工。", "verified": "一方稱", "source": "https://valuechain.wiki/umc?lang=en"}, {"from": "umc", "to": "broadcom", "type": "晶圓代工", "detail": "Broadcom 部分網通/儲存晶片由聯電成熟製程代工。", "verified": "已查證", "source": "https://www.morningstar.com/stocks/xnys/umc/quote?category=earnings&date=2026-04-22"}, {"from": "umc", "to": "intel", "type": "技術合作/晶圓代工", "detail": "聯電與 Intel 在美合作開發 12FFC 12nm FinFET 平台，目標 2027 量產。", "verified": "已查證", "source": "https://valuechain.wiki/umc?lang=en"}, {"from": "psmc", "to": "novatek", "type": "晶圓代工", "detail": "力積電為聯詠驅動 IC/利基產品成熟製程代工選項之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "psmc", "to": "amd", "type": "技術合作", "detail": "AMD 將採用力積電 Logic-DRAM 與 2.5D 中介層技術，與領先廠先進邏輯整合。", "verified": "已查證", "source": "https://www.digitimes.com/news/a20240905PD203/3d-ai-chips-powerchip-psmc-semicon-taiwan-2024-technology.html?mod=0"}, {"from": "vis", "to": "nanya", "type": "同集團/技術鄰接", "detail": "VIS 與南亞科同屬台塑集團旗下半導體布局，產品定位互補（功率/特色製程 vs. DRAM）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "nanya", "to": "nvidia", "type": "記憶體供應", "detail": "南亞科伺服器/資料中心 DRAM 客戶含 NVIDIA（經 LTA 鎖單）。", "verified": "一方稱", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"from": "nanya", "to": "google", "type": "記憶體供應", "detail": "南亞科客戶名單含 Google（雲端/AI 基礎設施 DRAM）。", "verified": "一方稱", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"from": "nanya", "to": "microsoft", "type": "記憶體供應", "detail": "南亞科客戶名單含 Microsoft（雲端伺服器 DRAM）。", "verified": "一方稱", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"from": "nanya", "to": "intel", "type": "記憶體供應", "detail": "南亞科客戶名單含 Intel（伺服器/PC DRAM）。", "verified": "一方稱", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"from": "nanya", "to": "amd", "type": "記憶體供應", "detail": "南亞科客戶名單含 AMD（伺服器/AI 客戶）。", "verified": "一方稱", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"from": "nanya", "to": "qualcomm", "type": "記憶體供應", "detail": "南亞科客戶名單含 Qualcomm（Edge/車用 DRAM）。", "verified": "一方稱", "source": "https://www.trendforce.com/news/2026/08/06/news-nanya-unveils-up-to-us10-7b-fab-5a-investment-plan-through-2029-targets-10nm-class-dram-with-euv/"}, {"from": "ase", "to": "mediatek", "type": "封裝代工", "detail": "日月光以FOCoS先進封裝承接聯發科訂單，聯發科據稱為日月光最大客戶。", "verified": "一方稱", "source": "https://finance.sina.com.cn/stock/t/2026-08-17/doc-ininruym7705453.shtml.md"}, {"from": "ase", "to": "novatek", "type": "封裝代工", "detail": "日月光提供DDIC專用bumping/COG/COF封裝服務給聯詠等顯示驅動IC客戶。", "verified": "一方稱", "source": "https://www.aseglobal.com/ch/about/"}, {"from": "ase", "to": "realtek", "type": "封裝代工", "detail": "日月光為瑞昱網通/周邊IC提供後段封裝服務（業界常態配套，未見公司單一明確披露）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "kyec", "to": "mediatek", "type": "測試服務", "detail": "京元電子投資人簡報明確將聯發科列為其測試服務客戶（標記*）。", "verified": "已查證", "source": "https://www.kyec.com.tw/Upfiles/EDUp/files/%E6%8A%95%E8%B3%87%E4%BA%BA%E9%97%9C%E4%BF%82/%E6%AF%8F%E5%AD%A3%E7%87%9F%E9%81%8B%E5%A0%B1%E5%91%8A/KYEC(2449)_2Q26%20Investor%20update_English.pdf"}, {"from": "kyec", "to": "nvidia", "type": "測試服務", "detail": "京元電子為NVIDIA等AI晶片大廠提供高階GPU/ASIC測試服務。", "verified": "一方稱", "source": "https://www.kyec.com.tw/en/About/company-profile"}, {"from": "kyec", "to": "apple", "type": "測試服務", "detail": "京元電子投資人簡報將Apple列為其測試服務客戶（標記*）。", "verified": "已查證", "source": "https://www.kyec.com.tw/Upfiles/EDUp/files/%E6%8A%95%E8%B3%87%E4%BA%BA%E9%97%9C%E4%BF%82/%E6%AF%8F%E5%AD%A3%E7%87%9F%E9%81%8B%E5%A0%B1%E5%91%8A/KYEC(2449)_2Q26%20Investor%20update_English.pdf"}, {"from": "ase", "to": "apple", "type": "封裝代工", "detail": "日月光為蘋果在台灣的主要封測服務供應商之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "ase", "to": "amd", "type": "先進封裝", "detail": "AMD已與日月光簽約並共同投資數億美元於FOCoS-Bridge先進封裝（對標CoWoS-L）。", "verified": "一方稱", "source": "https://finance.sina.com.cn/stock/t/2026-08-17/doc-ininruym7705453.shtml.md"}, {"from": "auo", "to": "novatek", "type": "零組件供應", "detail": "友達、群創等面板廠為聯詠DDIC下游整合客戶，將驅動IC整合進面板/模組。", "verified": "一方稱", "source": "https://menfem.com/companies/novatek"}, {"from": "innolux", "to": "novatek", "type": "零組件供應", "detail": "群創等面板廠為聯詠DDIC下游整合客戶。", "verified": "一方稱", "source": "https://menfem.com/companies/novatek"}, {"from": "foxconn", "to": "apple", "type": "組裝代工", "detail": "鴻海是 Apple iPhone 最大組裝夥伴，包攬幾乎全部高端 iPhone 訂單。", "verified": "已查證", "source": "https://www.caixin.com/2023-03-15/102008517.html"}, {"from": "foxconn", "to": "nvidia", "type": "AI 伺服器組裝", "detail": "鴻海為 NVIDIA GB200/GB300 NVL72 機櫃主要組裝商，稱握有全球逾四成 AI 伺服器市占。", "verified": "已查證", "source": "https://www.foxconn.com/en-us/press-center/events/foxconn-events/1601"}, {"from": "foxconn", "to": "meta", "type": "雲端伺服器組裝", "detail": "鴻海 AI 伺服器供應大型雲端與 hyperscaler 客戶(含 Meta)。", "verified": "一方稱", "source": "https://www.foxconn.com/en-us/press-center/press-releases/latest-news?year=2024"}, {"from": "quanta", "to": "apple", "type": "組裝代工", "detail": "廣達與鴻海共同包攬 Apple 大部分 Mac 電腦訂單，為 MacBook 主力 ODM。", "verified": "已查證", "source": "https://www.caixin.com/2023-03-15/102008517.html"}, {"from": "quanta", "to": "nvidia", "type": "AI 伺服器組裝", "detail": "廣達 QCT 為 NVIDIA AI 機架系統主要組裝商之一。", "verified": "已查證", "source": "https://nvidianews.nvidia.com/news/computer-industry-ai-factories-data-centers"}, {"from": "quanta", "to": "meta", "type": "雲端伺服器 ODM Direct", "detail": "廣達 ODM Direct 雲端客戶含 Meta(滲透率約 45%)。", "verified": "一方稱", "source": "https://www.athsinchu.com/post/241231-aiserver"}, {"from": "quanta", "to": "microsoft", "type": "雲端伺服器 ODM Direct", "detail": "廣達 ODM Direct 雲端客戶含 Microsoft(滲透率約 31%)。", "verified": "一方稱", "source": "https://www.athsinchu.com/post/241231-aiserver"}, {"from": "quanta", "to": "google", "type": "雲端伺服器 ODM Direct", "detail": "廣達 ODM Direct 雲端客戶含 Google(滲透率約 45%)。", "verified": "一方稱", "source": "https://www.athsinchu.com/post/241231-aiserver"}, {"from": "pegatron", "to": "apple", "type": "組裝代工", "detail": "和碩為 Apple 第二大 iPhone 組裝夥伴。", "verified": "已查證", "source": "https://startupnews.fyi/2024/02/02/tata-eyes-jv-with-pegatron-for-setting-up-iphone-assembly-plant-in-tn-2/"}, {"from": "pegatron", "to": "tesla", "type": "零組件供應", "detail": "和碩供應 Tesla Model 3 中控系統。", "verified": "一方稱", "source": "https://news.metal.com/newscontent/101343828/a-big-expansion-of-production-teslas-demand-for-spare-parts-increases/"}, {"from": "pegatron", "to": "asus", "type": "關係企業/OEM 品牌合作", "detail": "和碩 2008 年自華碩分割，為華碩品牌產品的重要代工夥伴。", "verified": "已查證", "source": "https://www.pcbasic.com/blog/top_contract_manufacturing_global.html"}, {"from": "wistron", "to": "dell", "type": "組裝代工", "detail": "緯創為 Dell 筆電與伺服器 ODM 客戶之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "wistron", "to": "nvidia", "type": "AI 伺服器組裝", "detail": "緯創被 NVIDIA 列為 AI 工廠合作組裝廠。", "verified": "已查證", "source": "https://investor.nvidia.com/news/press-release-details/2024/Computer-Industry-Joins-NVIDIA-to-Build-AI-Factories-and-Data-Centers-for-the-Next-Industrial-Revolution/default.aspx"}, {"from": "compal", "to": "dell", "type": "組裝代工", "detail": "仁寶為 Dell 筆電主要 ODM 之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "compal", "to": "lenovo", "type": "組裝代工", "detail": "仁寶為 Lenovo 筆電 ODM 客戶之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "compal", "to": "apple", "type": "組裝代工", "detail": "仁寶為 Apple iPad 組裝 ODM 之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "inventec", "to": "hpe", "type": "組裝代工", "detail": "英業達長期為 HPE 伺服器 ODM 代工夥伴。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "inventec", "to": "dell", "type": "組裝代工", "detail": "英業達為 Dell 伺服器 ODM 客戶之一。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "inventec", "to": "nvidia", "type": "AI 伺服器組裝", "detail": "英業達推出基於 NVIDIA HGX 的 P8000IG6 並列入 NVIDIA AI 工廠合作組裝廠。", "verified": "已查證", "source": "https://ebg.inventec.com/en/news/Press%20Release/2024/81"}, {"from": "quanta", "to": "dell", "type": "組裝代工", "detail": "廣達為 Dell 筆電 ODM 客戶之一。", "verified": "一方稱", "source": "https://www.aiwiki.ai/wiki/quanta_computer"}, {"from": "acer", "to": "compal", "type": "OEM 品牌合作/代工", "detail": "宏碁 PC 產品多由仁寶等 ODM 代工。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "acer", "to": "quanta", "type": "OEM 品牌合作/代工", "detail": "宏碁 PC 產品多由廣達等 ODM 代工。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "asus", "to": "nvidia", "type": "零組件供應", "detail": "華碩顯示卡與電競機型採用 NVIDIA GPU。", "verified": "一方稱", "source": "https://www.asus.com/id/news/qio5ghhdh8643nkm/"}, {"from": "asus", "to": "intel", "type": "零組件供應", "detail": "華碩筆電/主機板採用 Intel CPU。", "verified": "一方稱", "source": "https://www.asus.com/id/news/qio5ghhdh8643nkm/"}, {"from": "delta", "to": "apple", "type": "電源/充電元件供應", "detail": "台達為 Apple 供應電源/充電相關電力元件（Reuters 報導）。", "verified": "已查證", "source": "https://au.investing.com/news/stock-market-news/taiwans-delta-electronics-expanding-everywhere-on-ev-server-boom-2562050"}, {"from": "delta", "to": "tesla", "type": "車用電力元件供應", "detail": "台達為 Tesla 供應電力元件（車載充電/電力電子）。", "verified": "已查證", "source": "https://au.investing.com/news/stock-market-news/taiwans-delta-electronics-expanding-everywhere-on-ev-server-boom-2562050"}, {"from": "delta", "to": "nvidia", "type": "AI機櫃電源與散熱供應", "detail": "台達為 NVIDIA MGX/Blackwell 平台提供 33kW/66kW ORV3 power shelf 與液冷散熱。", "verified": "已查證", "source": "https://www.delta-americas.com/en-us/news/delta-unveils-a-total-cutting-edge-power-and-cooling-solution-tailored-for-the-nvidia-mgx-platform-at-ocp-global-summit-2024"}, {"from": "delta", "to": "foxconn", "type": "伺服器電源供應", "detail": "台達對鴻海等伺服器 ODM 出貨機櫃/伺服器電源供應器（產業常態，具體比重未公開）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "delta", "to": "quanta", "type": "伺服器電源供應", "detail": "台達對廣達等伺服器 ODM 出貨伺服器電源供應器（產業常態，具體比重未公開）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "liteon", "to": "apple", "type": "電源轉接器/供應器供應", "detail": "光寶為 Apple 供應 USB-PD 電源轉接器/供應器（產業公認，未見 Apple 直接披露）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "liteon", "to": "nvidia", "type": "AI伺服器電源系統供應", "detail": "光寶為 NVIDIA GB200 NVL72 設計製造符合 MGX/ORV3 的高效電源系統。", "verified": "已查證", "source": "https://www.liteon-cips.com/products/liteon-liquid-cooling-system/"}, {"from": "liteon", "to": "quanta", "type": "800VDC液冷電源機櫃合作", "detail": "光寶與廣達旗下雲達 QCT 聯合展出 800VDC 液冷電源機櫃、支援 Vera Rubin NVL72。", "verified": "已查證", "source": "https://www.knews.com.tw/search/%E9%9B%B2%E9%81%94"}, {"from": "largan", "to": "apple", "type": "iPhone高階鏡頭供應", "detail": "大立光為 Apple iPhone 高階相機鏡頭主力供應商，約 80% 營收來自 Apple。", "verified": "已查證", "source": "https://www.ftnn.com.tw/news/576995"}, {"from": "largan", "to": "samsung", "type": "手機鏡頭供應", "detail": "大立光供應 Samsung 等一線 Android 旗艦品牌手機鏡頭。", "verified": "一方稱", "source": "https://barfinex.com/persons/adam-lin-largan"}, {"from": "yageo", "to": "foxconn", "type": "被動元件(MLCC/電阻)供應", "detail": "國巨對鴻海等 EMS 大廠出貨 MLCC 與晶片電阻（產業常態，具體比重未公開）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "yageo", "to": "quanta", "type": "被動元件(MLCC/電阻)供應", "detail": "國巨對廣達等 ODM 出貨被動元件（產業常態，具體比重未公開）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "walsin", "to": "foxconn", "type": "被動元件(MLCC/電阻)供應", "detail": "華新科對 EMS/電源供應商出貨 MLCC 與晶片電阻（產業常態，具體比重未公開）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "auo", "to": "asus", "type": "筆電/顯示器面板供應", "detail": "友達對華碩出貨筆記型電腦與顯示器面板。", "verified": "一方稱", "source": "https://www.auo.com/en-global/products/index/Display_Panel_Products/Notebook"}, {"from": "auo", "to": "acer", "type": "筆電/顯示器面板供應", "detail": "友達對宏碁出貨筆記型電腦與顯示器面板。", "verified": "一方稱", "source": "https://www.auo.com/en-global/products/index/Display_Panel_Products/Notebook"}, {"from": "auo", "to": "dell", "type": "筆電/顯示器面板供應", "detail": "友達對 Dell 出貨筆電與桌面顯示器面板（產業常態）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "auo", "to": "hpe", "type": "筆電/顯示器面板供應", "detail": "友達對 HP/慧與出貨筆電與顯示器面板（產業常態）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "auo", "to": "apple", "type": "Mac筆電面板供應", "detail": "據產業報告友達主供 Apple Mac 用筆電面板。", "verified": "一方稱", "source": "https://www.docin.com/touch_new/preview_new.do?id=4963663726"}, {"from": "innolux", "to": "foxconn", "type": "集團面板垂直整合", "detail": "群創為鴻海子公司，鴻海垂直整合上游面板與下游 Apple/Sony 裝置組裝。", "verified": "已查證", "source": "https://policyrisk.com/supplymap/company/innolux-corporation"}, {"from": "innolux", "to": "apple", "type": "MacBook Air面板供應", "detail": "群創面板用於 Apple MacBook Air 機型（經鴻海組裝體系）。", "verified": "一方稱", "source": "https://policyrisk.com/supplymap/computers-and-laptops"}, {"from": "innolux", "to": "asus", "type": "筆電/顯示器面板供應", "detail": "群創對華碩出貨筆記型電腦與顯示器面板（含遊戲用 Fast-IPS）。", "verified": "一方稱", "source": "https://www.docin.com/touch_new/preview_new.do?id=4963663726"}, {"from": "innolux", "to": "acer", "type": "筆電/顯示器面板供應", "detail": "群創對宏碁出貨筆記型電腦與顯示器面板（產業常態）。", "verified": "一方稱", "source": "無公開來源，待確認"}, {"from": "innolux", "to": "samsung", "type": "電視面板供應", "detail": "群創對 Samsung 等電視品牌出貨大尺寸電視面板（產業常態）。", "verified": "一方稱", "source": "無公開來源，待確認"}], "events": [{"year": "2018-2019", "event_zh": "中美貿易戰開打，華為被列入美國實體清單（2019年5月）並啟動FDPR全面斷鏈（2020年5月）", "category": "政策管制", "impact": "華為海思曾佔台積電年營收約7.6%、大立光營收約10%來自華為；聯發科、大立光、台積電、光通訊零組件廠直接面臨華為訂單驟減風險，2019年5月台積電、大立光股價單日重挫，外資擔憂台灣供應鏈對中客戶集中度風險。", "resilience_lesson": "台灣IC設計與零組件廠加速分散客戶（聯發科转向中聯發、小米、三星及車用），台積電強化對美系大客戶（蘋果、NVIDIA、AMD）的先進製程依賴；企業開始重視『單一客戶/單一地緣』集中度風險，並把出口合規列為法務要務。", "verified": "已查證", "sources": ["http://its.taiwan.cssn.cn/cgzs/xzlz/jj/201905/t20190530_4910044.shtml", "https://www.androidauthority.com/tsmc-huawei-ban-989690/", "https://www.huawei.com/de/facts/voices-of-huawei/statement-regarding-the-us-department-of-commerce-announce"]}, {"year": "2020-2021", "event_zh": "COVID-19疫情爆發，遠距需求帶動消費電子爆量，2021年全球車用晶片荒", "category": "疫情", "impact": "約70%車用MCU由台積電製造，晶圓代工與封測（日月光、京元電）產能塞爆；豐田、福斯、Stellantis等車廠被迫減產，德國政府直接施壓台灣當局協調台積電、聯電、世界先進、力積電釋出產能；2021年1月行政院政委龔明鑫與四大晶圓廠協商車用晶片優先順序。", "resilience_lesson": "車廠與一線大廠開始簽訂長約（long-term agreement）、預付訂金鎖產能；台積電等Foundry採產能優先分配機制，車用MCU從成熟製程轉向更穩定的雙供應；日月光、京元電擴大車用與伺服器封測產能。", "verified": "已查證", "sources": ["https://svmi.com/chipmakers-agree-to-help-automakers/", "https://www.dr-ipms.com/news/10022-automakers-to-blame-for-semiconductor-shortage/", "https://www.cnnbrasil.com.br/economia/macroeconomia/em-meio-a-escassez-de-chips-tsmc-amplia-em-60-fabricacao-de-componentes/"]}, {"year": "2021", "event_zh": "台灣56年來大旱，南部科學園區半導體廠面臨缺水危機（2021年1-6月）", "category": "自然災害", "impact": "台積電每日用水近20萬噸，2021年2月起水情告急，台積電、聯電出動水車拉水、政府4月起對工業區減供減壓；南科晶圓廠生產一度受威脅，蘋果、NVIDIA供應鏈啟動風險評估；外界憂心台灣半導體『水資源命脈』單點集中。", "resilience_lesson": "台積電、聯電、日月光、群創、友達全面提高回收水率（先進封測廠回收水率達80-97%），興建專用水池、回收水系統；政府推動鳳山、安平再生水廠；企業將水電韌性（備援水車、應急水源）納入廠務風險管理。", "verified": "已查證", "sources": ["https://appleinsider.com/articles/21/02/24/apple-supplier-tsmc-hires-water-trucks-as-taiwan-drought-continues", "https://36kr.com/p/1244975442977798", "https://www.aspenpublicradio.org/2023-04-19/epic-drought-in-taiwan-pits-farmers-against-high-tech-factories-for-water"]}, {"year": "2021", "event_zh": "5月13日、5月17日全台大規模分區停電（興達電廠跳機），晶圓廠短暫跳脫/停機", "category": "自然災害", "impact": "興達電廠燃氣機組跳電造成全台約200萬戶停電，台積電、聯電部分廠區緊急切換不斷電系統（UPS）與自用發電機，雖未造成長期停產，但暴露單一電網對半導體生產的風險；外界估算台積電每停電1小時營收損失可達數十億新台幣等級。", "resilience_lesson": "晶圓廠強化雙電力進線、不斷電系統與緊急發電機備援；台電擴建燃氣機組與分散式電源；科技業對『可靠電力』成為海外設廠（亞利桑那、熊本）的重要誘因之一。", "verified": "已查證", "sources": ["https://36kr.com/p/1244975442977798", "http://news.cctv.com/2023/06/10/ARTILykgAsfwf9yOcbdFgIeZ230610.shtml"]}, {"year": "2022", "event_zh": "上海/昆山COVID封城（2022年3-5月），EMS與零組件廠停擺", "category": "疫情", "impact": "和碩上海/昆山廠（占全球iPhone組裝約20-30%）停工；廣達上海松江廠（約20%筆電產能）4月初停產；仁寶、緯創、神達在昆山廠區被迫停工；蘋果警示銷售損失上看80億美元；廣達、和碩、仁寶4月營收明顯衰退。", "resilience_lesson": "蘋果供應鏈加速『中國+1』布局，和碩、緯創、仁寶、廣達擴大印度、越南、泰國廠產能；EMS開始建立閉環生產（bubble）備案與多點分散组装線；ODM將筆電/伺服器產能分散至台灣、泰國、墨西哥。", "verified": "已查證", "sources": ["https://m.21jingji.com/article/20220414/herald/b3d969c00185ee23e68d9d16c530a0b2.html", "https://appleinsider.com/articles/22/04/12/apple-assembly-partners-shutter-factories-amid-shanghai-kunshan-lockdowns", "http://www.ce.cn/xwzx/gnsz/gdxw/202204/25/t20220425_37527396.shtml"]}, {"year": "2022", "event_zh": "鄭州富士康『iPhone城』因疫情封控爆發工人出走抗爭（2022年10-11月）", "category": "疫情", "impact": "鴻海鄭州廠承擔全球約80% iPhone產量、幾乎獨占iPhone 14 Pro組裝；2022年11月約2萬名工人離廠，11月產能損失估計逾30%；蘋果罕見發布新聞稿承認iPhone 14 Pro供應『非常緊縮』，分析師估計Q4短缺1500-2000萬支。", "resilience_lesson": "蘋果加速把高端iPhone組裝導入印度（和碩、鴻海、緯創欽奈廠），2025年印度組裝iPhone占全球約25%；鴻海在印度、越南擴廠，並建立『雙地組裝』關鍵機型；台灣組裝廠把關鍵機型分散至多國以降低單一廠區風險。", "verified": "已查證", "sources": ["https://www.apple.com/chde/newsroom/2022/11/update-on-supply-of-iphone-14-pro-and-iphone-14-pro-max/", "https://m.economictimes.com/news/international/business/more-than-20000-new-hires-have-left-apple-supplier-foxconns-zhengzhou-plant-in-china-foxconn-source/amp_articleshow/95755024.cms", "https://9to5mac.com/2022/11/25/mass-resignations/"]}, {"year": "2022-2023", "event_zh": "美國BIS於2022年10月對中國先進AI晶片與半導體設備祭出大規模出口管制，2023年10月再升級", "category": "政策管制", "impact": "NVIDIA A100/H100、AMD MI系列AI晶片禁止輸中，並透過FDPR要求海外晶圓廠（含台積電）出貨給中國客戶需美國許可；台積南京、上海FAB先進製程設備輸出受限；聯發科、矽品、京元電等需重新審視對中國客戶出貨；台灣檢方2026年起起訴業者非法出口AI伺服器至中國。", "resilience_lesson": "台灣晶圓代工與IC設計廠建立出口合規审查機制，區分『先進邏輯/AI/HBM』產品線；台積電將先進製程集中在台灣本島、成熟製程留在南京；客戶加速在台下單AI先進封裝與晶圓代工訂單（對台積電反而形成訂單磁吸效應）。", "verified": "已查證", "sources": ["http://news.china.com.cn/2022-09/02/content_78401040.htm", "https://publications.jrc.ec.europa.eu/repository/bitstream/JRC147129/JRC147129_01.pdf", "https://apnews.com/article/taiwan-servidores-ia-china-nvidia-2de14755239da86471037d80d5fa858f"]}, {"year": "2022", "event_zh": "裴洛西訪台後中國在台海周邊大規模軍演（2022年8月），地緣風險急速升溫", "category": "地緣政治", "impact": "中國海空軍演習跨越中線、部分飛航管制影響台海航運；蘋果緊急要求台灣供應商（台積電、和碩等）把輸往中國的零組件標示為『台灣，中國』以避免海關卡關，iPhone 14出貨一度傳出延遲疑慮；客戶開始要求台灣科技公司提出備援生產地點。", "resilience_lesson": "蘋果、微軟、Google等大客戶正式把『台海地緣風險』列為供應鏈審查重點，要求供應商提出多國產能分散計畫；和碩、鴻海、台達電等加速印度、越南、墨西哥布局；台積電啟動亞利桑那、熊本、德國德勒斯登廠，作為先進製程海外備援。", "verified": "已查證", "sources": ["https://www.supplychainbrain.com/articles/35479-apple-asks-suppliers-in-taiwan-to-label-products-as-made-in-china", "https://www.macrumors.com/2022/08/05/apple-supplier-denies-china-blocking-shipments/", "https://acoes.uibe.edu.cn/docs/2023-07/243144fd63234877877ee738a446d0fb.pdf"]}, {"year": "2024", "event_zh": "4月3日花蓮規模7.3強震（25年來最大），全台七大厂晶圓廠緊急停機檢查", "category": "自然災害", "impact": "台積電、聯電、世界先進、力積電、南亞科、華邦、旺宏等七大晶圓廠因廠區達4級以上自動停機疏散；台積電估影響工時約6小時、第二季營收減少約6000萬美元、毛利影響低於0.5個百分點；部分石英管、在製晶圓毀損；CoWoS先進封裝產線短暫停機，但趨勢科技/分析師判定無重大出貨中斷。", "resilience_lesson": "晶圓廠強化防震設計（7級抗震）、自動緊急停機與快速復機SOP；台積電事後強調可在數日內全數補回產量；此事件再次強化客戶對『台灣單一島嶼地震風險』的擔憂，加速海外設廠與備援產能要求。", "verified": "已查證", "sources": ["https://m.thepaper.cn/newsDetail_forward_26909203", "http://www.ce.cn/xwzx/gnsz/gdxw/202404/04/t20240404_38959285.shtml", "https://lockbox.lockton.com/m/278671b54fd784d7/original/Earthquake_semiconductor_whitepaper_20240624.pdf"]}, {"year": "2023-2025", "event_zh": "AI GPU需求爆發，台積電CoWoS先進封裝成為全球供應瓶頸（2023年中起售罄至2025-2026）", "category": "供給瓶頸", "impact": "NVIDIA搶下CoWoS約60-65%月產能，台積電2023年CoWoS月產能約8,000-16,000片，2024年倍增至約35,000-40,000片仍供不應求；台積電魏哲家直言CoWoS sold out through 2025 into 2026；訂單外溢至日月光（ASE）、南茂、京元電、Amkor，台灣OSAT大廠受惠。", "resilience_lesson": "台積電在竹南、中科擴建CoWoS專區，並釋出部分封裝訂單給日月光、Amkor；AI伺服器ODM（緯穎、廣達、鴻海）提前綁定HBM、ABF載板、PCB、被動元件長約；台灣設備與材料廠（弘塑、辛耘、家登、帆宣）受惠於先進封裝擴產。", "verified": "已查證", "sources": ["https://www.trendforce.com/news/2024/02/19/insights-cowos-capacity-shortage-challenges-ai-chip-demand-while-taiwanese-manufacturers-expand-to-seize-opportunities/", "https://www.softwareseni.com/tsmc-cowos-packaging-the-silent-bottleneck-in-the-ai-chip-supply-chain/", "https://www.36kr.com/p/2907360848403075"]}, {"year": "2020-2025", "event_zh": "台積電啟動全球化備援布局：美國亞利桑那Fab 21（2024Q4量產N4）、日本熊本JASM（2024年12月開幕）、德國德勒斯登ESMC", "category": "產能布局", "impact": "亞利桑那Fab 21第一廠2024年Q4以N4進入量產，第二廠N3預計2027下半年量產，第三廠2025年4月動工（N2/A16），2025年3月宣布投資額拉升至1650億美元；熊本JASM（與Sony、Denso合作）2024年12月開幕、2027年第二廠量產；台積電帶動台灣設備、材料、環控廠（帆宣、辛耘、亞德客、弘塑）跟進海外設廠。", "resilience_lesson": "台灣龍頭Foundry主動把先進製程『部分海外備援』，以化解地緣政治與客户要求；同時透過母廠技術授權、設備與材料出口，讓台灣本部仍掌握製程核心；供應鏈跟進出海形成『台灣母廠+海外子廠』的雙層韌性結構。", "verified": "已查證", "sources": ["https://www.tsmc.com/static/abouttsmcaz/index.htm", "https://investor.tsmc.com/static/annualReports/2025/english/pdf/2025_tsmc_ar_e_ch1.pdf", "https://news.taiwannet.com.tw/news/213495/%E6%97%A5%E6%9C%AC%E7%86%8A%E6%9C%AC7-1%E5%BC%B7%E9%9C%87%E9%9C%87%E6%92%BC%E5%8D%8A%E5%B0%8E%E9%AB%94%E4%BE%9B%E6%87%89%E9%8F%88%EF%BC%81%E5%8F%B0%E7%A9%8D%E9%9B%BBjasm%E7%B7%8A%E6%80%A5%E7%96%8F%E6%95%A3-%E5%85%A8%E7%90%83%E5%B8%82%E5%A0%B4%E9%AB%98%E5%BA%A6%E8%AD%A6%E6%88%92.html"]}, {"year": "2025-2026", "event_zh": "川普2.0關稅戰（對中國/台灣/墨西哥/印度加徵對等關稅，並威脅對手機、晶片課25%-100%關稅）", "category": "政策管制", "impact": "2025年美國對進口車手機、PC、半導體揮舞關稅大棒，川普威脅2025年6月底前對未赴美生產的手機廠課25%關稅、8月宣布對晶片課100%關稅；台灣國發會2025年調查顯示71.8%製造業產品美國技術含量未達20%仍需被課對等關稅；蘋果擴大印度iPhone組裝（2025年約5500萬支、占全球25%），立訊、歌爾、和碩在越南/印度產能達20-25%。", "resilience_lesson": "台灣ODM/EMS（和碩、廣達、仁寶、緯創、緯穎）加速把最終組裝移往印度、越南、泰國、墨西哥，以利用原產地規避關稅；AI伺服廠商把出美產品改在墨西哥/泰國組裝；企業開始做『原產地重組』與關稅成本試算。", "verified": "已查證", "sources": ["https://www.ndc.gov.tw/nc_333_39230", "https://www.jetro.go.jp/biz/areareports/special/2026/0401/bf4823aaa13608a4.html", "https://es.investing.com/news/stock-market-news/trump-anuncia-arancel-del-100-sobre-chips-mientras-apple-aumenta-inversion-en-eeuu-3253924", "https://www.stcn.com/article/detail/1655139.html"]}, {"year": "2016", "event_zh": "2016年4月日本熊本接連發生M6.5與M7.3地震，重創索尼/三菱半導體廠（歷史對照案例）", "category": "自然災害", "impact": "熊本地震導致索尼CIS影像感測器工廠、三菱電機功率半導體廠部分停產，全球CIS與車用MCU供應鏈一度緊張；十年後的2026年7月熊本再傳M7.1強震，台積電JASM緊急疏散，凸顯半導體群聚的地震單點風險仍未解。", "resilience_lesson": "此事件為後來『晶圓廠分散、雙廠區備援』的思維打底；Sony後續將CIS產能分散至山形、長崎；台積電熊本JASM在設計上採高抗震規格，作為海外廠區韌性測試案例。", "verified": "已查證", "sources": ["https://news.taiwannet.com.tw/news/213495/%E6%97%A5%E6%9C%AC%E7%86%8A%E6%9C%AC7-1%E5%BC%B7%E9%9C%87%E9%9C%87%E6%92%BC%E5%8D%8A%E5%B0%8E%E9%AB%94%E4%BE%9B%E6%87%89%E9%8F%88%EF%BC%81%E5%8F%B0%E7%A9%8D%E9%9B%BBjasm%E7%B7%8A%E6%80%A5%E7%96%8F%E6%95%A3-%E5%85%A8%E7%90%83%E5%B8%82%E5%A0%B4%E9%AB%98%E5%BA%A6%E8%AD%A6%E6%88%92.html"]}, {"year": "2025-2026", "event_zh": "台灣查緝非法出口AI伺服器至中國，美方持續施壓查緝紅供鏈", "category": "政策管制", "impact": "台灣檢調2026年起起訴9家業者涉嫌將搭載NVIDIA晶片的AI伺服器走私/假貨名義轉出口至中國；美方2025年4月再收緊AI晶片出口許可制；對台灣AI ODM（緯穎、廣達、技嘉、微星）形成合規成本出清，低階白牌伺服器出貨中國訂單萎縮。", "resilience_lesson": "台灣AI伺服器大廠建立出口分級審查與最終使用者（end-user）查驗；訂單重心轉往美系CSP（AWS、Microsoft、Google、Meta）在美國、新加坡、日本機房；合規人員、法務預算大幅增加。", "verified": "已查證", "sources": ["https://apnews.com/article/taiwan-servidores-ia-china-nvidia-2de14755239da86471037d80d5fa858f"]}], "external_nodes": [{"id": "meta", "name_zh": "Meta", "name_en": "Meta Platforms", "type": "海外客戶·雲端/CSP"}, {"id": "sumco", "name_zh": "SUMCO", "name_en": "SUMCO", "type": "海外供應商·矽晶圓"}, {"id": "tcl", "name_zh": "TCL華星光電", "name_en": "TCL CSOT", "type": "海外客戶·面板(中國)"}, {"id": "samsung", "name_zh": "三星", "name_en": "Samsung", "type": "海外客戶/競爭者"}, {"id": "amazon", "name_zh": "亞馬遜", "name_en": "Amazon (AWS)", "type": "海外客戶·雲端/CSP"}, {"id": "boe", "name_zh": "京東方", "name_en": "BOE", "type": "海外客戶·面板(中國)"}, {"id": "nintendo", "name_zh": "任天堂", "name_en": "Nintendo", "type": "海外客戶·遊戲主機"}, {"id": "shinetsu", "name_zh": "信越化學", "name_en": "Shin-Etsu Chemical", "type": "海外供應商·矽晶圓"}, {"id": "broadcom", "name_zh": "博通", "name_en": "Broadcom", "type": "海外客戶·網通/ASIC晶片"}, {"id": "corning", "name_zh": "康寧", "name_en": "Corning", "type": "海外供應商·玻璃基板"}, {"id": "microsoft", "name_zh": "微軟", "name_en": "Microsoft", "type": "海外客戶·雲端/CSP"}, {"id": "ti", "name_zh": "德州儀器", "name_en": "Texas Instruments", "type": "海外客戶/供應商·IDM"}, {"id": "nxp", "name_zh": "恩智浦", "name_en": "NXP", "type": "海外客戶/合資"}, {"id": "advantest", "name_zh": "愛德萬", "name_en": "Advantest", "type": "海外供應商·測試設備"}, {"id": "hpe", "name_zh": "慧與科技", "name_en": "HPE", "type": "海外客戶·伺服器"}, {"id": "amat", "name_zh": "應用材料", "name_en": "Applied Materials", "type": "海外供應商·設備"}, {"id": "dell", "name_zh": "戴爾", "name_en": "Dell Technologies", "type": "海外客戶·PC/伺服器"}, {"id": "tel", "name_zh": "東京威力科創", "name_en": "Tokyo Electron", "type": "海外供應商·設備"}, {"id": "teradyne", "name_zh": "泰瑞達", "name_en": "Teradyne", "type": "海外供應商·測試設備"}, {"id": "tesla", "name_zh": "特斯拉", "name_en": "Tesla", "type": "海外客戶·電動車"}, {"id": "globalwafers", "name_zh": "環球晶", "name_en": "GlobalWafers", "type": "供應商·矽晶圓(台灣)"}, {"id": "sony", "name_zh": "索尼", "name_en": "Sony", "type": "海外客戶·影像感測/遊戲"}, {"id": "lenovo", "name_zh": "聯想", "name_en": "Lenovo", "type": "海外客戶·PC"}, {"id": "asml", "name_zh": "艾司摩爾", "name_en": "ASML", "type": "海外供應商·EUV設備"}, {"id": "intel", "name_zh": "英特爾", "name_en": "Intel", "type": "海外客戶/合作·CPU"}, {"id": "infineon", "name_zh": "英飛凌", "name_en": "Infineon", "type": "海外客戶·車用晶片"}, {"id": "huawei", "name_zh": "華為", "name_en": "Huawei", "type": "海外客戶·受出口管制"}, {"id": "apple", "name_zh": "蘋果", "name_en": "Apple Inc.", "type": "海外客戶·消費電子品牌"}, {"id": "google", "name_zh": "谷歌", "name_en": "Google", "type": "海外客戶·雲端/CSP"}, {"id": "amd", "name_zh": "超微", "name_en": "AMD", "type": "海外客戶·CPU/GPU"}, {"id": "nvidia", "name_zh": "輝達", "name_en": "NVIDIA", "type": "海外客戶·GPU/AI晶片"}, {"id": "qualcomm", "name_zh": "高通", "name_en": "Qualcomm", "type": "海外客戶·手機晶片"}], "annotations": [{"topic": "重大衝擊事件時間軸", "note": "14 則已查證事件（2016-2026），見 events 區塊：涵蓋地緣政治（中美貿易戰、台海軍演、出口管制）、疫情（封城、車用晶片荒）、自然災害（旱災、停電、403 地震）、供給瓶頸（CoWoS）與需求衝擊（AI 暴衝）。"}, {"topic": "單一客戶集中風險", "note": "大立光約 80% 營收來自 Apple；台積電 2025 年 NVIDIA+Apple 合計約 36% 營收；鴻海、和碩高度依賴 Apple 組裝訂單；聯詠逾五成終端需求集中中國面板廠。", "companies": ["largan", "tsmc", "foxconn", "pegatron", "novatek"]}, {"topic": "地理集中風險", "note": "全球先進製程（7nm 以下）約 90% 產能在台（台積電）；大立光集中台中、群創集中台南、半導體廠多集中竹科/中科/南科；EMS 原高度集中中國（鄭州、上海、昆山），封城事件後加速分散。", "companies": ["tsmc", "largan", "innolux", "macronix", "foxconn"]}, {"topic": "雙供應商與產能分散策略", "note": "聯發科、瑞昱採台積電+聯電雙晶圓代工；台積電赴美（亞利桑那 1650 億美元）、日（熊本）、德（德勒斯登）；世界先進與 NXP 新加坡合資 67 億美元；鴻海、和碩、緯創等 EMS 加速印度/東南亞布局（緯創賣印度廠予 Tata 退出 iPhone）。", "companies": ["mediatek", "realtek", "tsmc", "vis", "foxconn", "pegatron", "wistron"]}, {"topic": "AI 需求衝擊與 CoWoS 瓶頸", "note": "2023-2025 AI GPU 缺貨、台積電 CoWoS 先進封裝供不應求至 2026，NVIDIA 包下約 60-65% 產能，訂單外溢日月光等 OSAT；AI 伺服器組裝（鴻海/廣達/緯創/英業達）與電源（台達/光寶）需求爆發，但高度依賴美國 CSP 資本支出循環。", "companies": ["tsmc", "ase", "foxconn", "quanta", "wistron", "inventec", "delta", "liteon"]}, {"topic": "出口管制與地緣政治", "note": "美國 2022-2023 對中晶片/設備出口管制（影響台積電南京廠、AI 晶片輸中禁令）；2019 華為禁令影響聯發科、大立光等華為鏈廠商；2025-2026 關稅戰加速供應鏈重組（EMS 布局印度/墨西哥/越南）。", "companies": ["tsmc", "mediatek", "largan", "foxconn"]}, {"topic": "記憶體與面板景氣循環", "note": "南亞科、華邦、旺宏受記憶體供需循環影響（旺宏的任天堂 ROM 業務與遊戲主機景氣綁定，Switch 2 改用 3D NAND 為策略轉折）；友達、群創受面板 Boom-Bust 循環與中國擴產擠壓，轉型車用/Micro LED 分散風險。", "companies": ["nanya", "winbond", "macronix", "auo", "innolux"]}, {"topic": "AI 伺服器需求與 CSP 資本支出", "note": "廣達、英業達、緯創轉型 AI 伺服器後，營收與 NVIDIA GPU 供貨、美國 hyperscaler（Meta/微軟/Google/Amazon）資本支出高度連動，是新的需求面韌性議題。", "companies": ["quanta", "inventec", "wistron", "foxconn"]}]};
+
+var categoryOrder = ["晶圓代工","記憶體","IC設計","封測","EMS 電子代工","品牌","關鍵零組件","面板"];
+var layerOrder = ["上游","中游","下游"];
+
+/* ===== 視圖切換 ===== */
+var navLinks = document.querySelectorAll(".nav a[data-view]");
+var views = ["home","chain","companies","resilience","themes","sources"];
+function showView(name){
+  views.forEach(function(v){
+    var el = document.getElementById(v);
+    if(el) el.classList.toggle("active", v === name);
+  });
+  navLinks.forEach(function(a){ a.classList.toggle("active", a.getAttribute("data-view")===name); });
+  window.scrollTo({top:0, behavior:"smooth"});
+  if(name === "chain"){
+    if(!chart){ initChart(); }
+    else { setTimeout(function(){ chart.resize(); }, 80); }
+  }
+}
+navLinks.forEach(function(a){
+  a.addEventListener("click", function(){ showView(a.getAttribute("data-view")); });
+});
+document.querySelectorAll("[data-goto]").forEach(function(a){
+  a.addEventListener("click", function(e){ e.preventDefault(); showView(a.getAttribute("data-goto")); });
+});
+
+/* ===== 公司索引 ===== */
+var companyById = {};
+DATA.companies.forEach(function(c){ companyById[c.id] = c; });
+var extById = {};
+DATA.external_nodes.forEach(function(n){ extById[n.id] = n; });
+
+/* ===== 供應鏈關係圖（ECharts） ===== */
+var chart = null;
+var showExt = false;
+var currentCat = "all";
+var catColor = {};
+(function(){
+  var palette = ["#e6a23c","#5b9bd5","#4fb286","#8e7cc3","#e0704f","#d9a441","#59b7c4","#b0885b"];
+  DATA.categories.forEach(function(cat, i){ catColor[cat] = palette[i % palette.length]; });
+})();
+
+function buildGraphData(){
+  var W = 1400, H = 920;
+  var nodes = [], links = [];
+
+  /* 環節 → 固定列 x；層級 → y 帶（上游 150 / 中游 470 / 下游 790） */
+  var catX = {}, catSpan = (W - 240) / Math.max(1, DATA.categories.length - 1);
+  DATA.categories.forEach(function(cat, i){
+    catX[cat] = 120 + i * catSpan;
+  });
+  var layerY = { "上游": 150, "中游": 470, "下游": 790 };
+  var catCnt = {};
+  DATA.categories.forEach(function(c){ catCnt[c] = 0; });
+
+  DATA.companies.forEach(function(c){
+    var n = catCnt[c.category]++;
+    var total = 0;
+    DATA.companies.forEach(function(cc){ if(cc.category === c.category) total++; });
+    /* 同環節多家公司垂直展開：以帶中心為準，上下均勻分佈 */
+    var spread = total > 1 ? 54 : 0;
+    var y = layerY[c.layer] + (n - (total - 1) / 2) * spread;
+    nodes.push({
+      id: c.id, name: c.name_zh, symbolSize: 36,
+      x: catX[c.category], y: y,
+      category: c.category,
+      layer: c.layer,
+      itemStyle: { color: catColor[c.category], borderColor: c.layer === "上游" ? "#9cc6ea" : (c.layer === "中游" ? "#8fd4b2" : "#f0a088"), borderWidth: c.layer === "中游" ? 2 : 3 },
+      label: { show: true, formatter: c.name_zh, fontSize: 11.5, color: "#eaf2f8" },
+      company: c
+    });
+  });
+
+  var extShown = {};
+  DATA.relations.forEach(function(r){
+    var isExtFrom = !companyById[r.from];
+    var isExtTo = !companyById[r.to];
+    if((isExtFrom || isExtTo) && !showExt) return;
+    links.push({ source: r.from, target: r.to, value: r.type, detail: r.detail, verified: r.verified });
+    if(isExtFrom) extShown[r.from] = true;
+    if(isExtTo) extShown[r.to] = true;
+  });
+
+  if(showExt){
+    var extL = [], extR = [];
+    DATA.external_nodes.forEach(function(n){
+      if(!extShown[n.id]) return;
+      /* 依關係方向歸類：被台灣公司供應 → 右側客戶；供應台灣公司 → 左側供應商 */
+      var asTarget = 0, asSource = 0;
+      DATA.relations.forEach(function(r){
+        if(r.from === n.id) asSource++;
+        if(r.to === n.id) asTarget++;
+      });
+      var left = asSource > asTarget;
+      var bucket = left ? extL : extR;
+      bucket.push(n);
+    });
+    function placeExt(list, xBase){
+      var step = list.length > 1 ? Math.min(64, (H - 200) / (list.length - 1)) : 40;
+      list.forEach(function(n, i){
+        nodes.push({
+          id: n.id, name: n.name_zh, symbolSize: 22,
+          x: xBase, y: 100 + (i * step),
+          category: "外部",
+          itemStyle: { color: "transparent", borderColor: "#7d93a8", borderWidth: 2 },
+          label: { show: true, formatter: n.name_zh, fontSize: 10, color: "#8fa6ba" },
+          external: true
+        });
+      });
+    }
+    placeExt(extL, 50);
+    placeExt(extR, W - 50);
+  }
+
+  /* 依目前環節篩選：保留該環節公司 + 直接相連的公司/外部節點 */
+  if(currentCat !== "all"){
+    var keepSet = {};
+    nodes.forEach(function(n){ if(n.category === currentCat) keepSet[n.id] = true; });
+    links.forEach(function(l){
+      if(keepSet[l.source]) keepSet[l.target] = true;
+      if(keepSet[l.target]) keepSet[l.source] = true;
+    });
+    nodes = nodes.filter(function(n){ return keepSet[n.id]; });
+    links = links.filter(function(l){ return keepSet[l.source] && keepSet[l.target]; });
+  }
+
+  return { nodes: nodes, links: links };
+}
+
+function initChart(){
+  chart = echarts.init(document.getElementById("chainChart"));
+  renderChart();
+  window.addEventListener("resize", function(){ chart.resize(); });
+}
+
+function renderChart(){
+  var d = buildGraphData();
+  var option = {
+    backgroundColor: "transparent",
+    tooltip: {
+      trigger: "item",
+      backgroundColor: "rgba(18,36,52,.96)",
+      borderColor: "rgba(230,242,248,.2)",
+      textStyle: { color: "#eaf2f8", fontSize: 12.5 },
+      formatter: function(p){
+        if(p.dataType === "edge"){
+          var l = p.data;
+          var from = companyById[l.source] ? companyById[l.source].name_zh : (extById[l.source] ? extById[l.source].name_zh : l.source);
+          var to = companyById[l.target] ? companyById[l.target].name_zh : (extById[l.target] ? extById[l.target].name_zh : l.target);
+          return "<b>" + from + " → " + to + "</b><br/>" + l.value + "<br/><span style='font-size:11px;color:#9fb6c8'>" + (l.detail||"") + "</span>";
+        }
+        return p.data.name;
+      }
+    },
+    series: [{
+      type: "graph",
+      layout: "none",
+      roam: true,
+      draggable: true,
+      data: d.nodes,
+      links: d.links,
+      lineStyle: { color: "rgba(230,242,248,.35)", width: 1.2, curveness: 0.08 },
+      edgeSymbol: ["none","arrow"],
+      edgeSymbolSize: 7,
+      emphasis: { focus: "adjacency", lineStyle: { width: 2.5, color: "#e6a23c" }, label: { fontSize: 12.5 } },
+      label: { color: "#eaf2f8", fontWeight: 500 },
+      animationDuration: 500
+    }]
+  };
+  chart.setOption(option, true);
+  chart.off("click");
+  chart.on("click", function(p){
+    if(p.dataType === "edge") return;
+    if(p.data && p.data.company) openDrawer(p.data.company.id);
+  });
+  chart.on("dblclick", function(){});
+}
+
+/* ===== 環節篩選 ===== */
+var catBtns = document.getElementById("catFilter");
+DATA.categories.forEach(function(cat){
+  var b = document.createElement("button");
+  b.className = "filter-btn";
+  b.textContent = cat;
+  b.setAttribute("data-cat", cat);
+  catBtns.appendChild(b);
+});
+catBtns.addEventListener("click", function(e){
+  var btn = e.target.closest(".filter-btn");
+  if(!btn || !btn.hasAttribute("data-cat")) return;
+  catBtns.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  btn.classList.add("active");
+  currentCat = btn.getAttribute("data-cat");
+  renderChart();
+});
+
+document.getElementById("toggleExt").addEventListener("click", function(){
+  showExt = !showExt;
+  this.textContent = showExt ? "－ 隱藏外部客戶／供應商" : "＋ 顯示外部客戶／供應商（32）";
+  this.classList.toggle("active", showExt);
+  renderChart();
+});
+
+/* ===== 圖例 ===== */
+(function(){
+  var lg = document.getElementById("chartLegend");
+  DATA.categories.forEach(function(cat){
+    var el = document.createElement("span");
+    el.className = "lg";
+    el.innerHTML = '<span class="dot" style="background:' + catColor[cat] + '"></span>' + cat;
+    lg.appendChild(el);
+  });
+  var ex = document.createElement("span");
+  ex.className = "lg";
+  ex.innerHTML = '<span class="dot ext"></span>外部客戶／供應商';
+  lg.appendChild(ex);
+})();
+
+/* ===== 公司資料庫 ===== */
+var compFilterTier = "all";
+var compFilterBtns = document.getElementById("compFilter");
+(function(){
+  var groups = {};
+  DATA.companies.forEach(function(c){ groups[c.category] = (groups[c.category]||0)+1; });
+  ["上游","中游","下游"].forEach(function(t){
+    var b = document.createElement("button");
+    b.className = "filter-btn";
+    b.textContent = t;
+    b.setAttribute("data-tier", t);
+    compFilterBtns.appendChild(b);
+  });
+})();
+compFilterBtns.addEventListener("click", function(e){
+  var btn = e.target.closest(".filter-btn");
+  if(!btn || !btn.hasAttribute("data-tier")) return;
+  compFilterBtns.querySelectorAll(".filter-btn").forEach(function(b){ b.classList.remove("active"); });
+  btn.classList.add("active");
+  compFilterTier = btn.getAttribute("data-tier");
+  renderCompanies();
+});
+
+function tierTagClass(layer){ return layer === "上游" ? "tier-up" : (layer === "中游" ? "tier-mid" : "tier-down"); }
+
+function renderCompanies(){
+  var grid = document.getElementById("compGrid");
+  var html = "";
+  DATA.companies.forEach(function(c){
+    if(compFilterTier !== "all" && c.layer !== compFilterTier) return;
+    html += '<div class="comp-card '+tierTagClass(c.layer)+'" data-id="'+c.id+'">'
+      + '<span class="tier-tag">'+c.layer+' · '+c.category+'</span>'
+      + '<h3>'+c.name_zh+' <span style="color:#9fb6c8;font-weight:500;font-size:14px;">'+c.name_en.split(" ")[0]+'</span></h3>'
+      + '<div class="code">'+(c.ticker ? c.ticker+" · " : "")+c.segment+'</div>'
+      + '<div class="role">'+c.resilience_relevance.slice(0,90)+'…</div>'
+      + '</div>';
+  });
+  grid.innerHTML = html;
+  grid.querySelectorAll(".comp-card").forEach(function(card){
+    card.addEventListener("click", function(){ openDrawer(card.getAttribute("data-id")); });
+  });
+}
+renderCompanies();
+
+/* ===== 詳情抽屜 ===== */
+var drawer = document.getElementById("drawer");
+var backdrop = document.getElementById("backdrop");
+var drawerBody = document.getElementById("drawerBody");
+function esc(s){ return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+function openDrawer(id){
+  var c = companyById[id];
+  if(!c) return;
+  var html = '<span class="tier-tag" style="display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;background:'+ (c.layer==="上游"?"rgba(91,155,213,.16)":c.layer==="中游"?"rgba(79,178,134,.16)":"rgba(224,112,79,.16)") +';color:'+(c.layer==="上游"?"#9cc6ea":c.layer==="中游"?"#8fd4b2":"#f0a088")+';margin-bottom:10px;">'+c.layer+' · '+c.category+'</span>'
+    + '<h2>'+esc(c.name_zh)+' <span style="font-size:17px;color:#9fb6c8;font-weight:500;">'+esc(c.name_en)+'</span></h2>'
+    + '<div class="dcode">'+(c.ticker?("股票代碼 "+c.ticker+" · "):"")+esc(c.segment)+'</div>'
+    + '<div class="drole">'+esc(c.resilience_relevance)+'</div>'
+    + '<h4>核心產品</h4><ul>'+ c.core_products.map(function(p){return '<li>'+esc(p)+'</li>';}).join("") +'</ul>'
+    + '<h4>關鍵客戶</h4><ul>'+ c.key_customers.map(function(p){return '<li>'+esc(p)+'</li>';}).join("") +'</ul>'
+    + '<h4>關鍵供應商</h4><ul>'+ c.key_suppliers.map(function(p){return '<li>'+esc(p)+'</li>';}).join("") +'</ul>';
+  if(c.facts && c.facts.length){
+    html += '<h4>事實與來源</h4>';
+    c.facts.forEach(function(f){
+      var vcls = f.verified === "已查證" ? "ok" : "warn";
+      html += '<div class="fact"><span class="v '+vcls+'">'+esc(f.verified)+'</span>'+esc(f.fact)
+        + (f.source ? '<span class="src">來源：<a href="'+esc(f.source)+'" target="_blank" rel="noopener">'+esc(f.source)+'</a></span>' : '')
+        + '</div>';
+    });
+  }
+  drawerBody.innerHTML = html;
+  drawer.classList.add("open");
+  backdrop.classList.add("open");
+  document.body.style.overflow = "hidden";
+}
+function closeDrawer(){
+  drawer.classList.remove("open");
+  backdrop.classList.remove("open");
+  document.body.style.overflow = "";
+}
+document.getElementById("drawerClose").addEventListener("click", closeDrawer);
+backdrop.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeDrawer(); });
+
+/* ===== 時間軸 ===== */
+(function(){
+  var tl = document.getElementById("timeline");
+  var html = "";
+  DATA.events.forEach(function(e){
+    html += '<div class="tl-item">'
+      + '<div class="tl-time">'+esc(e.year)+'</div>'
+      + '<div class="tl-axis"><span class="tl-dot"></span></div>'
+      + '<div class="tl-body">'
+      + (e.category ? '<span class="cat">'+esc(e.category)+'</span>' : '')
+      + '<div class="e">'+esc(e.event_zh)+'</div>'
+      + '<div class="d">'+esc(e.impact)+'</div>'
+      + (e.resilience_lesson ? '<div class="lesson"><b>韌性啟示</b> · '+esc(e.resilience_lesson)+'</div>' : '')
+      + '</div></div>';
+  });
+  tl.innerHTML = html;
+})();
+
+/* ===== 韌性主題 ===== */
+(function(){
+  var grid = document.getElementById("themeGrid");
+  var html = "";
+  DATA.annotations.forEach(function(a, i){
+    var tags = (a.companies||[]).map(function(id){
+      return companyById[id] ? '<span class="co">'+esc(companyById[id].name_zh)+'</span>' : '';
+    }).join("");
+    html += '<div class="theme-card">'
+      + '<h3><span class="n">'+(i+1)+'</span><span>'+esc(a.topic)+'</span></h3>'
+      + '<p>'+esc(a.note)+'</p>'
+      + (tags ? '<div class="tags">'+tags+'</div>' : '')
+      + '</div>';
+  });
+  grid.innerHTML = html;
+})();
+
+/* ===== 來源頁 ===== */
+(function(){
+  var note = document.getElementById("srcNote");
+  var stats = DATA.meta.stats;
+  var cf = stats.company_facts || {total:0, by_verified:{}};
+  var html = '<p><b>關於本頁</b>　'+esc(DATA.meta.description)+'</p>'
+    + '<p style="margin-top:12px;"><b>查證機制</b>　'+esc(DATA.meta.verification_note)+'</p>'
+    + '<div class="verify-row">'
+    + '<span class="vchip ok">已查證 公司事實 '+ (cf.by_verified["已查證"]||0) +' 條 / 關係 '+ (stats.relations_by_verified["已查證"]||0) +' 條 / 事件 '+ (stats.events_by_verified && stats.events_by_verified["已查證"] || "14") +' 則</span>'
+    + '<span class="vchip warn">一方稱 公司事實 '+ (cf.by_verified["一方稱"]||0) +' 條 / 關係 '+ (stats.relations_by_verified["一方稱"]||0) +' 條</span>'
+    + '<span class="vchip neutral">外部節點 '+ stats.external_nodes +' 個 · 重大衝擊事件 '+ stats.events +' 則</span>'
+    + '</div>'
+    + '<p style="margin-top:14px;"><b>資料範圍</b>　'+stats.companies+' 家公司、'+stats.relations+' 條供需關係、'+stats.events+' 則事件、'+stats.external_nodes+' 個外部客戶／供應商節點。每條關係與公司事實均附可追溯來源（詳見各公司詳情中的「事實與來源」）。</p>'
+    + '<p style="margin-top:14px;"><b>注意事項</b>　本頁為論文背景知識彙整，非投資建議；「一方稱」表示僅單一來源或業界推斷，未獲獨立佐證，引用於論文前請再核對原始來源。</p>';
+  note.innerHTML = html;
+})();
+
+/* ===== 啟動 ===== */
+/* 初始視圖即為 chain（或刷新後停在關係圖頁）時立即初始化；否則延遲到首次切換 chain 視圖（見 showView） */
+if(document.getElementById("chain").classList.contains("active")){ initChart(); }
+})();
+</script>
+</body>
+</html>
